@@ -1,4 +1,12 @@
 # rpi-ws281x-csharp
+This fork contains the following changes:
+
+* Added fix for [.Net Core Exception Issue](https://github.com/rpi-ws281x/rpi-ws281x-csharp/issues/2).
+* Added default Gamma Correction Map based on [this Adafruit document](https://learn.adafruit.com/led-tricks-gamma-correction/the-issue).
+* Added support for additional LED strips.
+* Added new [.Net Core Sample Program](src/CoreTestApp)
+##
+
 This is a C# wrapper for the great C assembly by Jeremy Garff to control WS281X LEDs by a Raspberry PI ([https://github.com/jgarff/rpi_ws281x](https://github.com/jgarff/rpi_ws281x)).
 It uses the P/Invoke calls to access the native assembly.
 
