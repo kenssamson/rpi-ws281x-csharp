@@ -11,7 +11,7 @@ namespace Native
 		public IntPtr rpi_hw;
 		public uint freq;
 		public int dmanum;
-		[MarshalAs(UnmanagedType.ByValArray, SizeConst = PInvoke.RPI_PWM_CHANNELS)]
-		public ws2811_channel_t[] channel;
+		public ws2811_channel_t channel_0;
+		public ws2811_channel_t channel_1;
 	}
 }

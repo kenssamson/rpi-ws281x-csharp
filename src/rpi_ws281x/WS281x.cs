@@ -28,14 +28,16 @@ namespace rpi_ws281x
 
 			_ws2811.dmanum	= settings.DMAChannel;
 			_ws2811.freq	= settings.Frequency;
-			_ws2811.channel = new ws2811_channel_t[PInvoke.RPI_PWM_CHANNELS];
 
-			for(int i=0; i<= _ws2811.channel.Length -1; i++)
+			_ws2811.channel_0 = InitChannel(0, settings);
+			_ws2811.channel_1 = InitChannel(1, settings);
+
+			if (settings.GammaCorrection != null)
 			{
-				if(settings.Channels[i] != null)
-				{
-					InitChannel(i, settings.Channels[i]);
-				}
+				if (settings.Channels.ContainsKey(0))
+					Marshal.Copy(Settings.GammaCorrection.ToArray(), 0, _ws2811.channel_0.gamma, Settings.GammaCorrection.Count);
+				if (settings.Channels.ContainsKey(1))
+					Marshal.Copy(Settings.GammaCorrection.ToArray(), 0, _ws2811.channel_1.gamma, Settings.GammaCorrection.Count);
 			}
 
 			Settings = settings;
@@ -57,13 +59,15 @@ namespace rpi_ws281x
 		/// </summary>
 		public void Render()
 		{
-			for(int i=0; i<= Settings.Channels.Length -1; i++)
+			if (Settings.Channels.ContainsKey(0))
 			{
-				if (Settings.Channels[i] != null)
-				{
-					var ledColor = Settings.Channels[i].LEDs.Select(x => x.RGBValue).ToArray();
-					Marshal.Copy(ledColor, 0, _ws2811.channel[i].leds, ledColor.Count());
-				}
+				var ledColor = Settings.Channels[0].LEDs.Select(x => x.RGBValue).ToArray();
+				Marshal.Copy(ledColor, 0, _ws2811.channel_0.leds, ledColor.Length);
+			}
+			if (Settings.Channels.ContainsKey(1))
+			{
+				var ledColor = Settings.Channels[1].LEDs.Select(x => x.RGBValue).ToArray();
+				Marshal.Copy(ledColor, 0, _ws2811.channel_1.leds, ledColor.Length);
 			}
 			
 			var result = PInvoke.ws2811_render(ref _ws2811);
@@ -86,6 +90,21 @@ namespace rpi_ws281x
 		}
 
 		/// <summary>
+		/// Clear all LEDs
+		/// </summary>
+		public void Reset()
+		{
+			foreach (var channel in Settings.Channels)
+			{
+				foreach (var led in channel.Value.LEDs)
+				{
+					led.Color = Color.Black;	// Black == OFF
+				}
+			}
+			Render();
+		}
+
+		/// <summary>
 		/// Returns the settings which are used to initialize the component
 		/// </summary>
 		public Settings Settings { get; private set; }
@@ -94,20 +113,26 @@ namespace rpi_ws281x
 		/// Initialize the channel propierties
 		/// </summary>
 		/// <param name="channelIndex">Index of the channel tu initialize</param>
-		/// <param name="channelSettings">Settings for the channel</param>
-		private void InitChannel(int channelIndex, Channel channelSettings)
+		/// <param name="settings">Controller Settings</param>
+		private ws2811_channel_t InitChannel(int channelIndex, Settings settings)
 		{
-			_ws2811.channel[channelIndex].count			= channelSettings.LEDs.Count;
-			_ws2811.channel[channelIndex].gpionum		= channelSettings.GPIOPin;
-			_ws2811.channel[channelIndex].brightness	= channelSettings.Brightness;
-			_ws2811.channel[channelIndex].invert		= Convert.ToInt32(channelSettings.Invert);
+			ws2811_channel_t channel = new ws2811_channel_t();
 
-			if(channelSettings.StripType != StripType.Unknown)
+			if (settings.Channels.ContainsKey(channelIndex))
 			{
-				//Strip type is set by the native assembly if not explicitly set.
-				//This type defines the ordering of the colors e. g. RGB or GRB, ...
-				_ws2811.channel[channelIndex].strip_type = (int)channelSettings.StripType;
+				channel.count		= settings.Channels[channelIndex].LEDs.Count;
+				channel.gpionum		= settings.Channels[channelIndex].GPIOPin;
+				channel.brightness	= settings.Channels[channelIndex].Brightness;
+				channel.invert		= Convert.ToInt32(settings.Channels[channelIndex].Invert);
+
+				if (settings.Channels[channelIndex].StripType != StripType.Unknown)
+				{
+					//Strip type is set by the native assembly if not explicitly set.
+					//This type defines the ordering of the colors e. g. RGB or GRB, ...
+					channel.strip_type = (int)settings.Channels[channelIndex].StripType;
+				}
 			}
+			return channel;
 		}
 
 		/// <summary>
