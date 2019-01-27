@@ -35,21 +35,15 @@ namespace rpi_ws281x
 			//This would cause errors because the native library has a pointer on the memory location of the object.
 			_ws2811Handle = GCHandle.Alloc(_ws2811, GCHandleType.Pinned);
 
-			//_ws2811.dmanum	= settings.DMAChannel;
-			//_ws2811.freq	= settings.Frequency;
-
-			//_ws2811.channel_0 = InitChannel(0, settings);
-			//_ws2811.channel_1 = InitChannel(1, settings);
-
 			if (settings.GammaCorrection != null)
 			{
 				if (settings.Controllers.ContainsKey(0))
-                    Marshal.Copy(this.settings.GammaCorrection.ToArray(), 0, _ws2811.channel_0.gamma, this.settings.GammaCorrection.Count);
+                    Marshal.Copy(this.Settings.GammaCorrection.ToArray(), 0, _ws2811.channel_0.gamma, this.Settings.GammaCorrection.Count);
 				if (settings.Controllers.ContainsKey(1))
-                    Marshal.Copy(this.settings.GammaCorrection.ToArray(), 0, _ws2811.channel_1.gamma, this.settings.GammaCorrection.Count);
+                    Marshal.Copy(this.Settings.GammaCorrection.ToArray(), 0, _ws2811.channel_1.gamma, this.Settings.GammaCorrection.Count);
 			}
 
-			this.settings = settings;
+			this.Settings = settings;
 
 			var initResult = PInvoke.ws2811_init(ref _ws2811);
 			if (initResult != ws2811_return_t.WS2811_SUCCESS)
@@ -67,14 +61,14 @@ namespace rpi_ws281x
 		/// </summary>
 		public void Render()
 		{
-			if (settings.Controllers.ContainsKey(0))
+			if (Settings.Controllers.ContainsKey(0))
 			{
-				var ledColor = settings.Controllers[0].GetColors();
+				var ledColor = Settings.Controllers[0].GetColors();
 				Marshal.Copy(ledColor, 0, _ws2811.channel_0.leds, ledColor.Length);
 			}
-			if (settings.Controllers.ContainsKey(1))
+			if (Settings.Controllers.ContainsKey(1))
 			{
-				var ledColor = settings.Controllers[1].GetColors();
+				var ledColor = Settings.Controllers[1].GetColors();
 				Marshal.Copy(ledColor, 0, _ws2811.channel_1.leds, ledColor.Length);
 			}
 			
@@ -87,7 +81,7 @@ namespace rpi_ws281x
 
 		public void SetAll(Color color)
 		{
-			foreach (var controller in settings.Controllers)
+			foreach (var controller in Settings.Controllers)
 			{
 				controller.Value.SetAll(color);
 			}
@@ -99,7 +93,7 @@ namespace rpi_ws281x
 		/// </summary>
 		public void Reset()
 		{
-			foreach (var controller in settings.Controllers)
+			foreach (var controller in Settings.Controllers)
 			{
 				controller.Value.Reset();
 			}
@@ -109,18 +103,18 @@ namespace rpi_ws281x
 		public Controller GetController(ControllerType controllerType = ControllerType.PWM0)
 		{
 			int channelNumber = (controllerType == ControllerType.PWM1) ? 1 : 0;
-			if (settings.Controllers.ContainsKey(channelNumber) && 
-				settings.Controllers[channelNumber].ControllerType == controllerType)
+			if (Settings.Controllers.ContainsKey(channelNumber) && 
+				Settings.Controllers[channelNumber].ControllerType == controllerType)
 			{
-				return settings.Controllers[channelNumber];
+				return Settings.Controllers[channelNumber];
 			}
 			return null;
 		}
-		
+
 		/// <summary>
 		/// Returns the settings which are used to initialize the component
 		/// </summary>
-		private Settings settings;
+		public Settings Settings;
 
 		/// <summary>
 		/// Initialize the channel propierties
@@ -159,8 +153,21 @@ namespace rpi_ws281x
 			return Marshal.PtrToStringAuto(strPointer);
 		}
 
-	#region IDisposable Support
-		private bool disposedValue = false; // To detect redundant calls
+        #region Obsolete
+
+        [Obsolete("SetLEDColor is depreciated, please use GetController(controllerType).SetLED(ledID,color) instead")]
+        public void SetLEDColor(int channelIndex, int ledID, Color color)
+        {
+            if (Settings.Controllers.ContainsKey(channelIndex))
+            {
+                Settings.Controllers[channelIndex].SetLED(ledID, color);
+            }
+        }
+
+        #endregion
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
 
 		protected virtual void Dispose(bool disposing)
 		{

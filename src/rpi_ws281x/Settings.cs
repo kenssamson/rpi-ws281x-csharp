@@ -41,7 +41,12 @@ namespace rpi_ws281x
 			Frequency = frequency;
 			DMAChannel = dmaChannel;
 			Controllers = new Dictionary<int, Controller>(PInvoke.RPI_PWM_CHANNELS);
-			GammaCorrection = null;		
+
+            #pragma warning disable 618
+            Channels = new ChannelCollection(Controllers);
+            #pragma warning restore 618
+
+            GammaCorrection = null;		
 
 			IsInitialized = false;		
 		}
@@ -150,5 +155,12 @@ namespace rpi_ws281x
 		internal List<Byte> GammaCorrection { get; private set; }
 
 		internal bool IsInitialized { get; set; }
-	}
+
+        #region Obsolete
+
+        [Obsolete("Accessing Channels directly is deprecated, please use Settings.AddController() and WS281x.GetController() methods instead.")]
+        public ChannelCollection Channels { get; private set; }
+
+        #endregion
+    }
 }
