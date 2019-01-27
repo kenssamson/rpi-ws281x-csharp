@@ -2,13 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TestApp
 {
-	class RainbowColorAnimation : IAnimation
+    class RainbowColorAnimation : IAnimation
 	{
 		private static int colorOffset = 0;
 
@@ -22,23 +19,22 @@ namespace TestApp
 			//The default settings uses a frequency of 800000 Hz and the DMA channel 10.
 			var settings = Settings.CreateDefaultSettings();
 
-			//Set brightness to maximum (255)
 			//Use Unknown as strip type. Then the type will be set in the native assembly.
-			settings.Channels[0] = new Channel(ledCount, 18, 255, false, StripType.WS2812_STRIP);
+            var controller = settings.AddController(ControllerType.PWM0, ledCount, StripType.WS2812_STRIP);
 
-			using (var controller = new WS281x(settings))
+			using (var device = new WS281x(settings))
 			{
 				var colors = GetAnimationColors();
 				while (!request.IsAbortRequested)
 				{
 				
-					for (int i = 0; i <= controller.Settings.Channels[0].LEDCount - 1; i++)
+					for (int i = 0; i < controller.LEDCount; i++)
 					{
 						var colorIndex = (i + colorOffset) % colors.Count;
-						controller.SetLEDColor(0, i, colors[colorIndex]);
+                        controller.SetLED(i, colors[colorIndex]);
 					}
 
-					controller.Render();
+					device.Render();
 
 					if (colorOffset == int.MaxValue)
 					{

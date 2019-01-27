@@ -1,14 +1,10 @@
 ﻿using rpi_ws281x;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TestApp
 {
-	class ColorWipe : IAnimation
+    class ColorWipe : IAnimation
 	{
 		public void Execute(AbortRequest request)
 		{
@@ -20,27 +16,28 @@ namespace TestApp
 			//The default settings uses a frequency of 800000 Hz and the DMA channel 10.
 			var settings = Settings.CreateDefaultSettings();
 
-			//Set brightness to maximum (255)
-			//Use Unknown as strip type. Then the type will be set in the native assembly.
-			settings.Channels[0] = new Channel(ledCount, 18, 255, false, StripType.WS2812_STRIP);
+            //Set brightness to maximum (255)
+            //Use Unknown as strip type. Then the type will be set in the native assembly.
+            settings.AddController(ledCount, Pin.Gpio18, StripType.WS2812_STRIP, ControllerType.PWM0, 255, false);
 
-			using (var controller = new WS281x(settings))
+			using (var device = new WS281x(settings))
 			{
 				while(!request.IsAbortRequested)
 				{
-					Wipe(controller, Color.Red);
-					Wipe(controller, Color.Green);
-					Wipe(controller, Color.Blue);
+					Wipe(device, Color.Red);
+					Wipe(device, Color.Green);
+					Wipe(device, Color.Blue);
 				}
 			}
 		}
 
-		private static void Wipe(WS281x controller, Color color)
+		private static void Wipe(WS281x device, Color color)
 		{
-			for (int i = 0; i <= controller.Settings.Channels[0].LEDs.Count - 1; i++)
+            var controller = device.GetController(ControllerType.PWM0);
+			for (int i = 0; i < controller.LEDCount; i++)
 			{
-				controller.SetLEDColor(0, i, color);
-				controller.Render();
+				controller.SetLED(i, color);
+				device.Render();
 				System.Threading.Thread.Sleep(1000 / 15);
 			}
 		}
