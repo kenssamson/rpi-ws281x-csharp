@@ -35,14 +35,8 @@ using (var rpi = new WS281x(settings))
 Please have a look at the [example program](src/CoreTestApp/Program.cs) and get familiar with the usage.
 
 ## Installation
-In order to get the wrapper working, you need build the shared C library first.
-The required source code is included via a git submodule and is located under lib/rpi-ws281x.
-This is a link to the original project.
-Switch to the directory and execute following commands:
-```
-scons
-gcc -shared -o ws2811.so *.o
-```
+In order to get the wrapper working, you need build the shared C library first.  Please refer to the 
+README in the [lib](lib) folder for more information.
 
 The P/Invoke functinality has a [special search pattern](http://www.mono-project.com/docs/advanced/pinvoke/#library-handling) to find the required assembly.
 For my tests I copied the ws2811.so assembly to /usr/lib (as mentioned in the link above).
