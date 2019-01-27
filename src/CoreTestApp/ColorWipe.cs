@@ -8,8 +8,6 @@ namespace CoreTestApp
 {
     public class ColorWipe : IAnimation
     {
-        private static int channelNumber = 0;
-
         public void Execute(AbortRequest request)
         {
             Console.Clear();
@@ -18,27 +16,31 @@ namespace CoreTestApp
             var ledCount = Int32.Parse(Console.ReadLine());
             var settings = Settings.CreateDefaultSettings();
 
-            settings.Channels[channelNumber] = new Channel(ledCount, 18, 255, false, StripType.WS2811_STRIP_RGB);
-
-            using (var controller = new WS281x(settings))
+            var channel = settings.AddController(ledCount, Pin.Gpio18, StripType.WS2811_STRIP_RGB);
+            using (var device = new WS281x(settings))
             {
                 while (!request.IsAbortRequested)
                 {
-                    Wipe(controller, Color.Red);
-                    Wipe(controller, Color.Green);
-                    Wipe(controller, Color.Blue);
+                    Wipe(device, Color.Red);
+                    Wipe(device, Color.Green);
+                    Wipe(device, Color.Blue);
                 }
-                controller.Reset();
+                device.Reset();
             }
         }
 
-        private static void Wipe(WS281x controller, Color color)
+        private static void Wipe(WS281x device, Color color)
         {
-            for (int i = 0; i < controller.Settings.Channels[channelNumber].LEDCount; i++)
+            var controller = device.GetController();
+            foreach (var led in controller.LEDs)
             {
-                controller.SetLEDColor(channelNumber, i, color);
-                controller.Render();
-                Thread.Sleep(500);
+                led.Color = color;
+                device.Render();
+
+                // wait for a minimum of 5 milliseconds
+                var waitPeriod = (int)Math.Max(500.0 / controller.LEDCount, 5.0); 
+
+                Thread.Sleep(waitPeriod);
             }
         }
     }

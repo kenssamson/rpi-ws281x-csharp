@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace rpi_ws281x
 {
@@ -10,25 +11,25 @@ namespace rpi_ws281x
 	/// </summary>
 	public class Settings
 	{
-		public static uint DEFAULT_TARGET_FREQ = 800000;
-		public static int DEFAULT_DMA_CHANNEL = 10;
+		public static readonly uint DEFAULT_TARGET_FREQ = 800000;
+		public static readonly int DEFAULT_DMA_CHANNEL = 10;
 
 		/// <summary>
 		/// Gamma Correction Factor 
 		/// 1.0 = no correction, higher values result in dimmer midrange colors
 		/// </summary>
-		public static float DEFAULT_GAMMA_CORRECTION = 2.8f;
+		public static readonly float DEFAULT_GAMMA_CORRECTION = 2.8f;
 
 		/// <summary>
 		/// Number of Colors (0 based) used in code (default is 255 - 8-bit colors)
 		/// </summary>
-		public static int DEFAULT_COLOR_IN_MAX = 255;
+		public static readonly int DEFAULT_COLOR_IN_MAX = 255;
 
 		/// <summary>
 		/// Number of Colors (0 based) used by strip. Default (255) is for 8-bit color strips.
 		/// Some strips, like LD8806 use 7-bit so 127 should be used instead of default
 		/// </summary>
-		public static int DEFAULT_COLOR_OUT_MAX = 255;
+		public static readonly int DEFAULT_COLOR_OUT_MAX = 255;
 		
 		/// <summary>
 		/// Settings to initialize the WS281x controller
@@ -39,8 +40,10 @@ namespace rpi_ws281x
 		{
 			Frequency = frequency;
 			DMAChannel = dmaChannel;
-			Channels = new Dictionary<int, Channel>(PInvoke.RPI_PWM_CHANNELS);
-			GammaCorrection = null;				
+			Controllers = new Dictionary<int, Controller>(PInvoke.RPI_PWM_CHANNELS);
+			GammaCorrection = null;		
+
+			IsInitialized = false;		
 		}
 
 		/// <summary>
@@ -56,7 +59,7 @@ namespace rpi_ws281x
 			return settings;
 		}
 
-				/// <summary>
+		/// <summary>
 		/// Create Gamma Correction Map to adjust Colors when using PWM to control LEDs
 		/// The <paramref name="gamma"/> is used to set the correction factor with higher values resulting in dimmer midrange colors and lower values being brighter, setting the value
 		/// to 1.0 will cause no correction.
@@ -67,33 +70,85 @@ namespace rpi_ws281x
 		/// <remarks>
 		/// See <a href="https://learn.adafruit.com/led-tricks-gamma-correction/the-issue">Gamma Correction Issue</a>.
 		/// </remarks>
-		public void SetGammaCorrection(float gamma, int max_in, int max_out)
+		public bool SetGammaCorrection(float gamma, int max_in, int max_out)
 		{
-			GammaCorrection = new List<byte>(max_in);
-			for (int i = 0; i < max_in; i++)
+			if (IsInitialized) 
 			{
-				GammaCorrection[i] = (byte)(Math.Pow((float)i / (float)max_in, gamma) * max_out + 0.5);
+				return false;
 			}
+			if (gamma >= 1.0f)
+			{
+				GammaCorrection = Enumerable.Range(0, max_in)
+					.Select(i => (byte)(Math.Pow((float)i / (float)max_in, gamma) * max_out + 0.5)).ToList();
+			}
+			else
+			{
+				GammaCorrection = null;
+			}
+			return true;
+		}
+
+		public Controller AddController(int ledCount, Pin pin, 
+			StripType stripType = StripType.Unknown, 
+			ControllerType controllerType = ControllerType.PWM0, 
+			byte brightness = 255, 
+			bool invert = false)
+		{
+			if (IsInitialized)
+			{
+				return null;
+			}
+
+			int channelNumber = (controllerType == ControllerType.PWM1) ? 1 : 0;
+			Controllers[channelNumber] = new Controller(ledCount, pin, brightness, invert, stripType, controllerType);
+		
+			return Controllers[channelNumber];
+		}
+
+		public Controller AddController(ControllerType controllerType, int ledCount, StripType stripType = StripType.Unknown)
+		{
+			Controller controller = null;
+			switch (controllerType)
+			{
+				case ControllerType.PWM0:
+					controller = AddController(ledCount, Pin.Gpio18, stripType, controllerType);
+					break;
+
+				case ControllerType.PWM1:
+					controller = AddController(ledCount, Pin.Gpio13, stripType, controllerType);
+					break;
+
+				case ControllerType.PCM:
+					controller = AddController(ledCount, Pin.Gpio21, stripType, controllerType);
+					break;
+
+				case ControllerType.SPI:
+					controller = AddController(ledCount, Pin.Gpio10, stripType, controllerType);
+					break;
+			}
+			return controller;
 		}
 
 		/// <summary>
 		/// Returns the used frequency in Hz
 		/// </summary>
-		public uint Frequency { get; private set; }
+		internal uint Frequency { get; private set; }
 
 		/// <summary>
 		/// Returns the DMA channel
 		/// </summary>
-		public int DMAChannel { get; private set; }
+		internal int DMAChannel { get; private set; }
 
 		/// <summary>
 		/// Returns the channels which holds the LEDs
 		/// </summary>
-		public Dictionary<int,Channel> Channels { get; private set; }
+		internal Dictionary<int,Controller> Controllers { get; private set; }
 
 		/// <summary>
-		/// Gamma Corrections Map
+		/// Returns the Gamma Corrections Map
 		/// </summary>
-		public List<Byte> GammaCorrection { get; private set; }
+		internal List<Byte> GammaCorrection { get; private set; }
+
+		internal bool IsInitialized { get; set; }
 	}
 }

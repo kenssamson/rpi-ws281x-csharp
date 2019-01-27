@@ -21,32 +21,40 @@ namespace rpi_ws281x
 		/// <param name="settings">Settings used for initialization</param>
 		public WS281x(Settings settings)
 		{
-			_ws2811 = new ws2811_t();
+			settings.IsInitialized = true;
+
+			_ws2811 = new ws2811_t
+			{
+				dmanum = settings.DMAChannel,
+				freq = settings.Frequency,
+				channel_0 = InitChannel(0, settings),
+				channel_1 = InitChannel(1, settings)
+			};
+			
 			//Pin the object in memory. Otherwies GC will probably move the object to another memory location.
 			//This would cause errors because the native library has a pointer on the memory location of the object.
 			_ws2811Handle = GCHandle.Alloc(_ws2811, GCHandleType.Pinned);
 
-			_ws2811.dmanum	= settings.DMAChannel;
-			_ws2811.freq	= settings.Frequency;
+			//_ws2811.dmanum	= settings.DMAChannel;
+			//_ws2811.freq	= settings.Frequency;
 
-			_ws2811.channel_0 = InitChannel(0, settings);
-			_ws2811.channel_1 = InitChannel(1, settings);
+			//_ws2811.channel_0 = InitChannel(0, settings);
+			//_ws2811.channel_1 = InitChannel(1, settings);
 
 			if (settings.GammaCorrection != null)
 			{
-				if (settings.Channels.ContainsKey(0))
-					Marshal.Copy(Settings.GammaCorrection.ToArray(), 0, _ws2811.channel_0.gamma, Settings.GammaCorrection.Count);
-				if (settings.Channels.ContainsKey(1))
-					Marshal.Copy(Settings.GammaCorrection.ToArray(), 0, _ws2811.channel_1.gamma, Settings.GammaCorrection.Count);
+				if (settings.Controllers.ContainsKey(0))
+                    Marshal.Copy(this.settings.GammaCorrection.ToArray(), 0, _ws2811.channel_0.gamma, this.settings.GammaCorrection.Count);
+				if (settings.Controllers.ContainsKey(1))
+                    Marshal.Copy(this.settings.GammaCorrection.ToArray(), 0, _ws2811.channel_1.gamma, this.settings.GammaCorrection.Count);
 			}
 
-			Settings = settings;
+			this.settings = settings;
 
 			var initResult = PInvoke.ws2811_init(ref _ws2811);
 			if (initResult != ws2811_return_t.WS2811_SUCCESS)
 			{
-				var returnMessage = GetMessageForStatusCode(initResult);
-				throw new Exception(String.Format("Error while initializing.{0}Error code: {1}{0}Message: {2}", Environment.NewLine, initResult.ToString(), returnMessage));
+				throw WS281xException.Create(initResult, "initializing");
 			}	
 
 			//Disposing is only allowed if the init was successfull.
@@ -59,34 +67,31 @@ namespace rpi_ws281x
 		/// </summary>
 		public void Render()
 		{
-			if (Settings.Channels.ContainsKey(0))
+			if (settings.Controllers.ContainsKey(0))
 			{
-				var ledColor = Settings.Channels[0].LEDs.Select(x => x.RGBValue).ToArray();
+				var ledColor = settings.Controllers[0].GetColors();
 				Marshal.Copy(ledColor, 0, _ws2811.channel_0.leds, ledColor.Length);
 			}
-			if (Settings.Channels.ContainsKey(1))
+			if (settings.Controllers.ContainsKey(1))
 			{
-				var ledColor = Settings.Channels[1].LEDs.Select(x => x.RGBValue).ToArray();
+				var ledColor = settings.Controllers[1].GetColors();
 				Marshal.Copy(ledColor, 0, _ws2811.channel_1.leds, ledColor.Length);
 			}
 			
 			var result = PInvoke.ws2811_render(ref _ws2811);
 			if (result != ws2811_return_t.WS2811_SUCCESS)
 			{
-				var returnMessage = GetMessageForStatusCode(result);
-				throw new Exception(String.Format("Error while rendering.{0}Error code: {1}{0}Message: {2}", Environment.NewLine, result.ToString(), returnMessage));
+				throw WS281xException.Create(result, "rendering");
 			}
 		}
 
-		/// <summary>
-		/// Sets the color of a given LED
-		/// </summary>
-		/// <param name="channelIndex">Channel which controls the LED</param>
-		/// <param name="ledID">ID/Index of the LED</param>
-		/// <param name="color">New color</param>
-		public void SetLEDColor(int channelIndex, int ledID, Color color)
+		public void SetAll(Color color)
 		{
-			Settings.Channels[channelIndex].LEDs[ledID].Color = color;
+			foreach (var controller in settings.Controllers)
+			{
+				controller.Value.SetAll(color);
+			}
+			Render();
 		}
 
 		/// <summary>
@@ -94,20 +99,28 @@ namespace rpi_ws281x
 		/// </summary>
 		public void Reset()
 		{
-			foreach (var channel in Settings.Channels)
+			foreach (var controller in settings.Controllers)
 			{
-				foreach (var led in channel.Value.LEDs)
-				{
-					led.Color = Color.Black;	// Black == OFF
-				}
+				controller.Value.Reset();
 			}
 			Render();
 		}
 
+		public Controller GetController(ControllerType controllerType = ControllerType.PWM0)
+		{
+			int channelNumber = (controllerType == ControllerType.PWM1) ? 1 : 0;
+			if (settings.Controllers.ContainsKey(channelNumber) && 
+				settings.Controllers[channelNumber].ControllerType == controllerType)
+			{
+				return settings.Controllers[channelNumber];
+			}
+			return null;
+		}
+		
 		/// <summary>
 		/// Returns the settings which are used to initialize the component
 		/// </summary>
-		public Settings Settings { get; private set; }
+		private Settings settings;
 
 		/// <summary>
 		/// Initialize the channel propierties
@@ -118,18 +131,18 @@ namespace rpi_ws281x
 		{
 			ws2811_channel_t channel = new ws2811_channel_t();
 
-			if (settings.Channels.ContainsKey(channelIndex))
+			if (settings.Controllers.ContainsKey(channelIndex))
 			{
-				channel.count		= settings.Channels[channelIndex].LEDs.Count;
-				channel.gpionum		= settings.Channels[channelIndex].GPIOPin;
-				channel.brightness	= settings.Channels[channelIndex].Brightness;
-				channel.invert		= Convert.ToInt32(settings.Channels[channelIndex].Invert);
+				channel.count		= settings.Controllers[channelIndex].LEDCount;
+				channel.gpionum		= settings.Controllers[channelIndex].GPIOPin;
+				channel.brightness	= settings.Controllers[channelIndex].Brightness;
+				channel.invert		= Convert.ToInt32(settings.Controllers[channelIndex].Invert);
 
-				if (settings.Channels[channelIndex].StripType != StripType.Unknown)
+				if (settings.Controllers[channelIndex].StripType != StripType.Unknown)
 				{
 					//Strip type is set by the native assembly if not explicitly set.
 					//This type defines the ordering of the colors e. g. RGB or GRB, ...
-					channel.strip_type = (int)settings.Channels[channelIndex].StripType;
+					channel.strip_type = (int)settings.Controllers[channelIndex].StripType;
 				}
 			}
 			return channel;

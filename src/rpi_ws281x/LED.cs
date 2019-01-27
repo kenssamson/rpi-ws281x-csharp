@@ -10,17 +10,10 @@ namespace rpi_ws281x
 		/// <summary>
 		/// LED which can be controlled by the WS281x controller
 		/// </summary>
-		/// <param name="id">ID / index of the LED</param>
-		public LED(int id)
+		internal LED()
 		{
-			ID = id;
 			Color = Color.Empty;
 		}
-
-		/// <summary>
-		/// Returns the ID / index of the LED
-		/// </summary>
-		public int ID { get; private set; }
 
 		/// <summary>
 		/// Gets or sets the color for the LED
@@ -30,7 +23,6 @@ namespace rpi_ws281x
 		/// <summary>
 		/// Returns the RGB value of the color
 		/// </summary>
-		public int RGBValue { get => Color.ToArgb(); }
-
+		internal int RGBValue => Color.ToArgb();
 	}
 }

@@ -9,7 +9,6 @@ namespace CoreTestApp
     public class RainbowColorAnimation : IAnimation
     {
         private static int colorOffset = 0;
-        private static int channelNumber = 0;
 
         public void Execute(AbortRequest request)
         {
@@ -19,24 +18,24 @@ namespace CoreTestApp
             var ledCount = Int32.Parse(Console.ReadLine());
             var settings = Settings.CreateDefaultSettings();
 
-            settings.Channels[channelNumber] = new Channel(ledCount, 18, 255, false, StripType.WS2811_STRIP_RGB);
+            var controller = settings.AddController(ledCount, Pin.Gpio18, StripType.WS2811_STRIP_RGB);
 
-            using (var controller = new WS281x(settings))
+            using (var device = new WS281x(settings))
             {
                 var colors = GetAnimationColors();
                 while (!request.IsAbortRequested)
                 {
-                    for (int i = 0; i < controller.Settings.Channels[channelNumber].LEDCount; i++)
+                    for (int i = 0; i < controller.LEDCount; i++)
                     {
                         var colorIndex = (i + colorOffset) % colors.Count;
-                        controller.SetLEDColor(channelNumber, i, colors[colorIndex]);
+                        controller.SetLED(i, colors[colorIndex]);
                     }
-                    controller.Render();
+                    device.Render();
                     colorOffset = (colorOffset + 1) % colors.Count;
 
                     Thread.Sleep(500);
                 }
-                controller.Reset();
+                device.Reset();
             }
         }
 
