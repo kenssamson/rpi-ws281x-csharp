@@ -1,3 +1,5 @@
+BSD 2-Clause License
+
 Copyright (c) 2019, Ken Samson
 All rights reserved.
 
@@ -6,7 +8,7 @@ All rights reserved.
 
 This repository is a fork of rpi-ws281x/rpi-ws281x-csharp. All original
 portions are copyright under Urmel11, 2018. All modifications and 
-new portions (project CoreTestApp) are copyright under Ken Samson, 2019.  
+new portions (project CoreTestApp) are copyright under Ken Samson, 2019. 
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
