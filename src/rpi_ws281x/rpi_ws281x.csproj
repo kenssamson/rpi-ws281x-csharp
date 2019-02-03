@@ -9,6 +9,7 @@
     <PackageId>kenssamson.rpi-ws281x-csharp</PackageId>
     <Authors>Ken Samson</Authors>
     <Company />
+    <Title>.Net Library wrapper for the rpi-ws281x library</Title>
     <Product>.Net Library wrapper for the rpi-ws281x library</Product>
     <Description>This is a fork of the original .Net Library. It has been updated to work properly with .Net Core 2.2 and contains additional features.</Description>
     <Copyright>Copyright © 2019 Ken Samson. All rights reserved.</Copyright>
@@ -16,7 +17,7 @@
     <RepositoryUrl>https://github.com/kenssamson/rpi-ws281x-csharp.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://kenssamson.github.io/rpi-ws281x-csharp/</PackageProjectUrl>
-    <PackageTags>C# .Net RaspberryPi ws281x ws2811 ws2812 RPI</PackageTags>
+    <PackageTags>C#;.Net;RaspberryPi;ws281x;ws2811;ws2812;RPI</PackageTags>
     <PackageReleaseNotes>Initial release.</PackageReleaseNotes>
     <PackageIconUrl>https://i.ibb.co/SJM9C6s/rpi-csharp.png</PackageIconUrl>
   </PropertyGroup>
