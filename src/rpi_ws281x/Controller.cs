@@ -18,8 +18,8 @@ namespace rpi_ws281x
 			StripType = stripType;
 			ControllerType = controllerType;
 
-			LEDColors = Enumerable.Repeat(new LED(), ledCount).ToList();
-		}
+            LEDColors = Enumerable.Range(0, ledCount).Select(x => new LED()).ToList();
+        }
 
 		public void SetLED(int ledID, Color color)
 		{
