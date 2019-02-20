@@ -35,21 +35,21 @@ namespace rpi_ws281x
 			//This would cause errors because the native library has a pointer on the memory location of the object.
 			_ws2811Handle = GCHandle.Alloc(_ws2811, GCHandleType.Pinned);
 
-			if (settings.GammaCorrection != null)
+            var initResult = PInvoke.ws2811_init(ref _ws2811);
+            if (initResult != ws2811_return_t.WS2811_SUCCESS)
+            {
+                throw WS281xException.Create(initResult, "initializing");
+            }           
+
+            this.Settings = settings;
+
+            if (settings.GammaCorrection != null)
 			{
 				if (settings.Controllers.ContainsKey(0))
                     Marshal.Copy(this.Settings.GammaCorrection.ToArray(), 0, _ws2811.channel_0.gamma, this.Settings.GammaCorrection.Count);
 				if (settings.Controllers.ContainsKey(1))
                     Marshal.Copy(this.Settings.GammaCorrection.ToArray(), 0, _ws2811.channel_1.gamma, this.Settings.GammaCorrection.Count);
 			}
-
-			this.Settings = settings;
-
-			var initResult = PInvoke.ws2811_init(ref _ws2811);
-			if (initResult != ws2811_return_t.WS2811_SUCCESS)
-			{
-				throw WS281xException.Create(initResult, "initializing");
-			}	
 
 			//Disposing is only allowed if the init was successfull.
 			//Otherwise the native cleanup function throws an error.
