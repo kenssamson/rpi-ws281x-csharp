@@ -20,13 +20,6 @@
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://kenssamson.github.io/rpi-ws281x-csharp/</PackageProjectUrl>
     <PackageTags>C#;.Net;RaspberryPi;ws281x;ws2811;ws2812;RPI</PackageTags>
-    <PackageReleaseNotes>
-      [Change] Removed option to view Settings after Initializing the Device, 
-      [Change] Default setting is only update LEDs after color change, option to override,  
-      [Change] Error result contains more details from base library, 
-      [Bugfix] Memory Leak when using Gamma Correction, 
-      [Bugfix] Strips with multiple LEDs where not initialized correctly
-    </PackageReleaseNotes>
     <PackageIconUrl>https://i.ibb.co/SJM9C6s/rpi-csharp.png</PackageIconUrl>
   </PropertyGroup>
 

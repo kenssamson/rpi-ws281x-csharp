@@ -1,3 +1,6 @@
+[![Nuget](https://img.shields.io/nuget/dt/kenssamson.rpi-ws281x-csharp.svg?color=brightgreen&style=popout)](https://www.nuget.org/packages/kenssamson.rpi-ws281x-csharp/)
+[![License](https://img.shields.io/badge/License-BSD%202--Clause-orange.svg)](https://opensource.org/licenses/BSD-2-Clause)
+
 # rpi-ws281x-csharp
 This fork contains the following changes:
 
@@ -35,11 +38,20 @@ using (var rpi = new WS281x(settings))
 Please have a look at the [example program](src/CoreTestApp/Program.cs) and get familiar with the usage.
 
 ## Installation
+The library can be downloaded from NuGet: [![Nuget](https://img.shields.io/nuget/v/kenssamson.rpi-ws281x-csharp.svg?style=popout)](https://www.nuget.org/packages/kenssamson.rpi-ws281x-csharp/)
+
+**Package Manager**
+> PM\> Install-Package kenssamson.rpi-ws281x-csharp
+
+**.NET CLI** 
+> \> dotnet add package kenssamson.rpi-ws281x-csharp
+
+
 In order to get the wrapper working, you need build the shared C library first.  Please refer to the 
 README in the [lib](lib) folder for more information.
 
-The P/Invoke functinality has a [special search pattern](http://www.mono-project.com/docs/advanced/pinvoke/#library-handling) to find the required assembly.
-For my tests I copied the ws2811.so assembly to /usr/lib (as mentioned in the link above).
+The P/Invoke functionality has a [special search pattern](http://www.mono-project.com/docs/advanced/pinvoke/#library-handling) to find the required assembly.
+For my tests, I copied the ws2811.so assembly to /usr/lib folder (as suggested by the link above).
 
 ## Test status
 The wrapper was tested with following setup:
