@@ -5,17 +5,14 @@ namespace rpi_ws281x
 {
     public class WS281xException : Exception
     {
-        public int ErrorNumber { get; private set; }
+        public ws2811_return_t ErrorNumber { get; private set; }
 
         public string ErrorCode { get; private set; }
         
-        public string ErrorMessage { get; private set; }
-
-        internal WS281xException(ws2811_return_t return_code, string return_error, string message) : base(message)
+        internal WS281xException(ws2811_return_t return_code, string message) : base(message)
         {
-             ErrorNumber = (int)return_code;
-             ErrorCode = Enum.GetName(typeof(ws2811_return_t), ErrorNumber);
-             ErrorMessage = return_error;
+             ErrorNumber = return_code;
+             ErrorCode = Enum.GetName(typeof(ws2811_return_t), return_code);
         }
 
         internal static WS281xException Create(ws2811_return_t return_code, string status)
@@ -23,15 +20,21 @@ namespace rpi_ws281x
             var errorMessage = GetErrorMessage(return_code);
             var message = $"An Error occurred while {status} - {errorMessage} ({(int)return_code})";
 
-            return new WS281xException(return_code, errorMessage, message);
+            return new WS281xException(return_code, message);
         }
 
-        private static string GetErrorMessage(ws2811_return_t return_code)
+        /// <summary>
+        /// Return a user friendly message based on return code
+        /// </summary>
+        public static string GetErrorMessage(ws2811_return_t return_code)
         {
             var result = string.Empty;
 
             switch (return_code)
             {
+                case ws2811_return_t.WS2811_SUCCESS:
+                    result = "Operation Successful";
+                    break;
                 case ws2811_return_t.WS2811_ERROR_GENERIC:
                     result = "Generic failure";
                     break;
@@ -86,6 +89,10 @@ namespace rpi_ws281x
 
                 case ws2811_return_t.WS2811_ERROR_SPI_TRANSFER:
                     result = "SPI transfer error";
+                    break;
+                
+                default:
+                    result = "Unknown Error Occurred";
                     break;
             }
             return result;
