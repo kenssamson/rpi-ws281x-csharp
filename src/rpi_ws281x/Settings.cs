@@ -47,15 +47,13 @@ namespace rpi_ws281x
             #pragma warning restore 618
 
             GammaCorrection = null;		
-
-			IsInitialized = false;		
 		}
 
 		/// <summary>
 		/// Returns default settings.
 		/// Use a frequency of 800000 Hz and DMA channel 10
+		/// Gamma Correction factor of 2.8 and 256 colors.
 		/// </summary>
-		/// <returns></returns>
 		public static Settings CreateDefaultSettings()
 		{
 			var settings = new Settings(DEFAULT_TARGET_FREQ, DEFAULT_DMA_CHANNEL);
@@ -65,22 +63,19 @@ namespace rpi_ws281x
 		}
 
 		/// <summary>
-		/// Create Gamma Correction Map to adjust Colors when using PWM to control LEDs
+		/// Create Gamma Correction Map to adjust Colors when using PWM to control LEDs. This should only be used before the device has been initialized. 
 		/// The <paramref name="gamma"/> is used to set the correction factor with higher values resulting in dimmer midrange colors and lower values being brighter, setting the value
 		/// to 1.0 will cause no correction.
 		/// </summary>
-		/// <param name="gamma">correction factor - default 2.8</param>
-		/// <param name="max_out">output color range - default is 255</param>
-		/// <param name="max_in">input color range - default is 255</param>
+		/// <param name="gamma">correction factor</param>
+		/// <param name="max_out">output color range</param>
+		/// <param name="max_in">input color range</param>
+		/// <returns>true if set, false otherwise</returns>
 		/// <remarks>
 		/// See <a href="https://learn.adafruit.com/led-tricks-gamma-correction/the-issue">Gamma Correction Issue</a>.
 		/// </remarks>
 		public bool SetGammaCorrection(float gamma, int max_in, int max_out)
 		{
-			if (IsInitialized) 
-			{
-				return false;
-			}
 			if (gamma >= 1.0f)
 			{
 				GammaCorrection = Enumerable.Range(0, max_in)
@@ -93,42 +88,57 @@ namespace rpi_ws281x
 			return true;
 		}
 
+		/// <summary>
+		/// Adds/Updates controller using provided settings.
+		/// </summary>
+		/// <param name="ledCount">number of LEDs</param>
+		/// <param name="pin">GPIO pin used to controller strip</param>
+		/// <param name="stripType">type of strip</param>
+		/// <param name="controllerType">type of controller - should be supported by selected pin</param>
+		/// <param name="brightness">maximum brightness for LEDs</param>
+		/// <param name="invert">true if signal should be inverted because polarity is reversed</param>
 		public Controller AddController(int ledCount, Pin pin, 
 			StripType stripType = StripType.Unknown, 
 			ControllerType controllerType = ControllerType.PWM0, 
 			byte brightness = 255, 
 			bool invert = false)
 		{
-			if (IsInitialized)
-			{
-				return null;
-			}
-
 			int channelNumber = (controllerType == ControllerType.PWM1) ? 1 : 0;
 			Controllers[channelNumber] = new Controller(ledCount, pin, brightness, invert, stripType, controllerType);
 		
 			return Controllers[channelNumber];
 		}
 
-		public Controller AddController(ControllerType controllerType, int ledCount, StripType stripType = StripType.Unknown)
+		/// <summary>
+		/// Adds/Updates controller using default GPIO pin - should only be used with 40-PIN GPIO Boards.
+		/// </summary>
+		/// <param name="controllerType">type of controller - PWM, PCM, SPI</param>
+		/// <param name="ledCount">number of LEDs</param>
+		/// <param name="stripType">type of strip</param>
+		/// <param name="brightness">maximum brightness for LEDs</param>
+		/// <param name="invert">true if signal should be inverted because polarity is reversed</param>
+		public Controller AddController(ControllerType controllerType, int ledCount, 
+			StripType stripType = StripType.Unknown, 
+			byte brightness = 255, 
+			bool invert = false)
 		{
 			Controller controller = null;
 			switch (controllerType)
 			{
 				case ControllerType.PWM0:
-					controller = AddController(ledCount, Pin.Gpio18, stripType, controllerType);
+					controller = AddController(ledCount, Pin.Gpio18, stripType, controllerType, brightness, invert);
 					break;
 
 				case ControllerType.PWM1:
-					controller = AddController(ledCount, Pin.Gpio13, stripType, controllerType);
+					controller = AddController(ledCount, Pin.Gpio13, stripType, controllerType, brightness, invert);
 					break;
 
 				case ControllerType.PCM:
-					controller = AddController(ledCount, Pin.Gpio21, stripType, controllerType);
+					controller = AddController(ledCount, Pin.Gpio21, stripType, controllerType, brightness, invert);
 					break;
 
 				case ControllerType.SPI:
-					controller = AddController(ledCount, Pin.Gpio10, stripType, controllerType);
+					controller = AddController(ledCount, Pin.Gpio10, stripType, controllerType, brightness, invert);
 					break;
 			}
 			return controller;
@@ -154,11 +164,9 @@ namespace rpi_ws281x
 		/// </summary>
 		internal List<Byte> GammaCorrection { get; private set; }
 
-		internal bool IsInitialized { get; set; }
-
         #region Obsolete
 
-        [Obsolete("Accessing Channels directly is deprecated, please use Settings.AddController() and WS281x.GetController() methods instead.")]
+        [Obsolete("Accessing Channels directly is deprecated, please use AddController() instead.")]
         public ChannelCollection Channels { get; private set; }
 
         #endregion
