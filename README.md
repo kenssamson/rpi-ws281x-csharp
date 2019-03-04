@@ -1,5 +1,7 @@
-[![Nuget](https://img.shields.io/nuget/dt/kenssamson.rpi-ws281x-csharp.svg?color=brightgreen&style=popout)](https://www.nuget.org/packages/kenssamson.rpi-ws281x-csharp/)
+![Nuget](https://img.shields.io/nuget/v/kenssamson.rpi-ws281x-csharp.svg?label=version&style=popout)
+![Framework](https://img.shields.io/static/v1.svg?label=.NET&nbsp;Standard&message=v2.0&color=blue)
 [![License](https://img.shields.io/badge/License-BSD%202--Clause-orange.svg)](https://opensource.org/licenses/BSD-2-Clause)
+[![Nuget](https://img.shields.io/nuget/dt/kenssamson.rpi-ws281x-csharp.svg?color=brightgreen&style=popout)](https://www.nuget.org/packages/kenssamson.rpi-ws281x-csharp/)
 
 # rpi-ws281x-csharp
 This fork contains the following changes:
@@ -8,6 +10,8 @@ This fork contains the following changes:
 * Added default Gamma Correction Map based on [this Adafruit document](https://learn.adafruit.com/led-tricks-gamma-correction/the-issue).
 * Added support for additional LED strips.
 * Added new [.Net Core Sample Program](src/CoreTestApp)
+
+Please review latest [Release Notes](ReleaseNotes.md) for most recent changes.
 ##
 
 This is a C# wrapper for the great C assembly by Jeremy Garff to control WS281X LEDs by a Raspberry PI ([https://github.com/jgarff/rpi_ws281x](https://github.com/jgarff/rpi_ws281x)).
