@@ -1,4 +1,4 @@
-![Nuget](https://img.shields.io/nuget/v/kenssamson.rpi-ws281x-csharp.svg?label=version&style=popout)
+[![Nuget](https://img.shields.io/nuget/v/kenssamson.rpi-ws281x-csharp.svg?label=version&style=popout)](ReleaseNotes.md)
 ![Framework](https://img.shields.io/static/v1.svg?label=.NET&nbsp;Standard&message=v2.0&color=blue)
 [![License](https://img.shields.io/badge/License-BSD%202--Clause-orange.svg)](https://opensource.org/licenses/BSD-2-Clause)
 [![Nuget](https://img.shields.io/nuget/dt/kenssamson.rpi-ws281x-csharp.svg?color=brightgreen&style=popout)](https://www.nuget.org/packages/kenssamson.rpi-ws281x-csharp/)
