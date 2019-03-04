@@ -2,6 +2,7 @@
 
   <PropertyGroup Label="Build">
     <TargetFramework>netstandard2.0</TargetFramework>
+    <VersionPrefix>1.1.0</VersionPrefix>
   </PropertyGroup>
 
   <PropertyGroup Label="Package">
