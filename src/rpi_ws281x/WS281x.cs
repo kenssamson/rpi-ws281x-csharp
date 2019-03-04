@@ -62,6 +62,7 @@ namespace rpi_ws281x
 		/// <summary>
 		/// Renders the content of the channels
 		/// </summary>
+		/// <param name="force">Force LEDs to updated - default only updates if when a change is done</param>
 		public void Render(bool force = false)
 		{
 			bool shouldRender = false;
