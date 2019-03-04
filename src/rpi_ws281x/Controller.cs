@@ -11,6 +11,8 @@ namespace rpi_ws281x
 	{
 		internal Controller(int ledCount, Pin pin, byte  brightness, bool invert, StripType stripType, ControllerType controllerType)
 		{
+			IsDirty = false;
+
 			Pin = pin;
 			GPIOPin = (int)pin;
 			Invert = invert;
@@ -21,23 +23,43 @@ namespace rpi_ws281x
             LEDColors = Enumerable.Range(0, ledCount).Select(x => new LED()).ToList();
         }
 
+		/// <summary>
+		/// Set LED to a Color
+		/// </summary>
+		/// <param name="ledID">LED to set (0 based)</param>
+		/// <param name="color">Color to use</param>
 		public void SetLED(int ledID, Color color)
 		{
 			LEDColors[ledID].Color = color;
+			IsDirty = true;
 		}
 
+		/// <summary>
+		/// Set all the LEDs in the strip to same color
+		/// </summary>
+		/// <param name="color">color to set all the LEDs</param>
 		public void SetAll(Color color)
 		{
 			LEDColors.ForEach(led => led.Color = color);
+			IsDirty = true;
 		}
 
+		/// <summary>
+		/// Turn off all the LEDs in the strip
+		/// </summary>
 		public void Reset()
 		{
 			LEDColors.ForEach(led => led.Color = Color.Empty);
+			IsDirty = true;
 		}
 
-		internal int[] GetColors()
+		/// <summary>
+		/// array of LEDs with numeric color values
+		/// </summary>
+		/// <param name="clearDirty">reset dirty flag</param>
+		internal int[] GetColors(bool clearDirty = false)
 		{
+			if (clearDirty) IsDirty = false;
 			return LEDColors.Select(x => x.RGBValue).ToArray();
 		}
 		
@@ -76,8 +98,20 @@ namespace rpi_ws281x
         /// </summary>
         public IReadOnlyCollection<LED> LEDs => LEDColors.AsReadOnly();
 
+		/// <summary>
+		/// The number of LEDs in the strip
+		/// </summary>
         public int LEDCount => LEDColors.Count;
 		
+		/// <summary>
+		/// The type of controller (i.e. PWM, PCM, SPI  )
+		/// </summary>
+		/// <value></value>
 		public ControllerType ControllerType { get; private set; }
+
+		/// <summary>
+		/// Indicates if the colors assigned to the LED has changed and the LED should be updated.
+		/// </summary>
+		internal bool IsDirty { get; set; }
 	}
 }
