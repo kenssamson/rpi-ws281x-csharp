@@ -8,7 +8,7 @@
   <PropertyGroup Label="Package">
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageId>kenssamson.rpi-ws281x-csharp</PackageId>
-    <PackageVersion>1.1.0</PackageVersion>
+    <PackageVersion>1.1.1</PackageVersion>
     <Authors>Ken Samson</Authors>
     <Company />
     <Title>.Net Library wrapper for the rpi-ws281x library</Title>
