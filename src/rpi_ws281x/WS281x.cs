@@ -96,8 +96,12 @@ namespace rpi_ws281x
 		/// <param name="color">color to display</param>
 		public void SetAll(Color color)
 		{
-			foreach (var controller in _controllers.Values)
-			{
+			foreach (Controller controller in _controllers.Values) {
+				// If our strip type has a white component, adjust the color value so it renders correctly
+				var cName = controller.StripType.ToString();
+				if (cName.Contains("W") && cName.Contains("SK")) {
+					color = ColorUtil.ClampAlpha(color);
+				} 
 				controller.SetAll(color);
 				controller.IsDirty = false;
 			}
@@ -168,6 +172,11 @@ namespace rpi_ws281x
         {
             if (_controllers.ContainsKey(channelIndex))
             {
+	            // If our strip type has a white component, adjust the color value so it renders correctly
+	            var cName = _controllers[channelIndex].StripType.ToString();
+	            if (cName.Contains("W") && cName.Contains("SK")) {
+		            color = ColorUtil.ClampAlpha(color);
+	            }
                 _controllers[channelIndex].SetLED(ledID, color);
             }
         }

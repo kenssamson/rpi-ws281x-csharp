@@ -30,6 +30,11 @@ namespace rpi_ws281x
 		/// <param name="color">Color to use</param>
 		public void SetLED(int ledID, Color color)
 		{
+			// If our strip type has a white component, adjust the color value so it renders correctly
+			var cName = StripType.ToString();
+			if (cName.Contains("W") && cName.Contains("SK")) {
+				color = ColorUtil.ClampAlpha(color);
+			}
 			LEDColors[ledID].Color = color;
 			IsDirty = true;
 		}
@@ -40,6 +45,11 @@ namespace rpi_ws281x
 		/// <param name="color">color to set all the LEDs</param>
 		public void SetAll(Color color)
 		{
+			// If our strip type has a white component, adjust the color value so it renders correctly
+			var cName = StripType.ToString();
+			if (cName.Contains("W") && cName.Contains("SK")) {
+				color = ColorUtil.ClampAlpha(color);
+			}
 			LEDColors.ForEach(led => led.Color = color);
 			IsDirty = true;
 		}
