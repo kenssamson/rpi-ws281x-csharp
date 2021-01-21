@@ -28,25 +28,7 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="194c8936-272a-47dc-a2f5-d254ebdac1e5" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/CoreTestApp/AbortRequest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/StandardTestApp/AbortRequest.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CoreTestApp/ColorWipe.cs" beforeDir="false" afterPath="$PROJECT_DIR$/StandardTestApp/ColorWipe.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CoreTestApp/CoreTestApp.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/StandardTestApp/StandardTestApp.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CoreTestApp/IAnimation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/StandardTestApp/IAnimation.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CoreTestApp/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/StandardTestApp/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CoreTestApp/RainbowColorAnimation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/StandardTestApp/RainbowColorAnimation.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TestApp/ColorWipe.cs" beforeDir="false" afterPath="$PROJECT_DIR$/TestApp/ColorWipe.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TestApp/TestApp.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/TestApp/TestApp.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpi_ws281x.sln" beforeDir="false" afterPath="$PROJECT_DIR$/rpi_ws281x.sln" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpi_ws281x/Channel.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpi_ws281x/ChannelCollection.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpi_ws281x/Controller.cs" beforeDir="false" afterPath="$PROJECT_DIR$/rpi_ws281x/Controller.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpi_ws281x/Pin.cs" beforeDir="false" afterPath="$PROJECT_DIR$/rpi_ws281x/Pin.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpi_ws281x/Settings.cs" beforeDir="false" afterPath="$PROJECT_DIR$/rpi_ws281x/Settings.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpi_ws281x/WS281x.cs" beforeDir="false" afterPath="$PROJECT_DIR$/rpi_ws281x/WS281x.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpi_ws281x/WS281xException.cs" beforeDir="false" afterPath="$PROJECT_DIR$/rpi_ws281x/WS281xException.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpi_ws281x/rpi_ws281x.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/rpi_ws281x/rpi_ws281x.csproj" afterDir="false" />
-    </list>
+    <list default="true" id="194c8936-272a-47dc-a2f5-d254ebdac1e5" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -129,7 +111,7 @@
       <option name="presentableId" value="Default" />
       <updated>1611251647898</updated>
       <workItem from="1611251666054" duration="674000" />
-      <workItem from="1611269879582" duration="2909000" />
+      <workItem from="1611269879582" duration="3316000" />
     </task>
     <servers />
   </component>
