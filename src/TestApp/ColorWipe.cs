@@ -33,7 +33,7 @@ namespace TestApp
 
 		private static void Wipe(WS281x device, Color color)
 		{
-            var controller = device.GetController(ControllerType.PWM0);
+            var controller = device.GetController();
 			for (int i = 0; i < controller.LEDCount; i++)
 			{
 				controller.SetLED(i, color);

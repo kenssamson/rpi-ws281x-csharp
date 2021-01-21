@@ -16,7 +16,7 @@ namespace CoreTestApp
             var ledCount = Int32.Parse(Console.ReadLine());
             var settings = Settings.CreateDefaultSettings();
 
-            var channel = settings.AddController(ledCount, Pin.Gpio18, StripType.WS2811_STRIP_RGB);
+            var controller = settings.AddController(ledCount, Pin.Gpio18, StripType.WS2811_STRIP_RGB);
             using (var device = new WS281x(settings))
             {
                 while (!request.IsAbortRequested)

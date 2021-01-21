@@ -11,25 +11,25 @@ namespace rpi_ws281x
 	/// </summary>
 	public class Settings
 	{
-		public static readonly uint DEFAULT_TARGET_FREQ = 800000;
-		public static readonly int DEFAULT_DMA_CHANNEL = 10;
+		public static readonly uint DefaultTargetFreq = 800000;
+		public static readonly int DefaultDmaChannel = 10;
 
 		/// <summary>
 		/// Gamma Correction Factor 
 		/// 1.0 = no correction, higher values result in dimmer midrange colors
 		/// </summary>
-		public static readonly float DEFAULT_GAMMA_CORRECTION = 2.8f;
+		private static readonly float DefaultGammaCorrection = 2.8f;
 
 		/// <summary>
 		/// Number of Colors (0 based) used in code (default is 255 - 8-bit colors)
 		/// </summary>
-		public static readonly int DEFAULT_COLOR_IN_MAX = 255;
+		private static readonly int DefaultColorInMax = 255;
 
 		/// <summary>
 		/// Number of Colors (0 based) used by strip. Default (255) is for 8-bit color strips.
 		/// Some strips, like LD8806 use 7-bit so 127 should be used instead of default
 		/// </summary>
-		public static readonly int DEFAULT_COLOR_OUT_MAX = 255;
+		private static readonly int DefaultColorOutMax = 255;
 		
 		/// <summary>
 		/// Settings to initialize the WS281x controller
@@ -40,13 +40,7 @@ namespace rpi_ws281x
 		{
 			Frequency = frequency;
 			DMAChannel = dmaChannel;
-			Controllers = new Dictionary<int, Controller>(PInvoke.RPI_PWM_CHANNELS);
-
-            #pragma warning disable 618
-            Channels = new ChannelCollection(Controllers);
-            #pragma warning restore 618
-
-            GammaCorrection = null;		
+			GammaCorrection = null;		
 		}
 
 		/// <summary>
@@ -56,8 +50,8 @@ namespace rpi_ws281x
 		/// </summary>
 		public static Settings CreateDefaultSettings()
 		{
-			var settings = new Settings(DEFAULT_TARGET_FREQ, DEFAULT_DMA_CHANNEL);
-			settings.SetGammaCorrection(DEFAULT_GAMMA_CORRECTION, DEFAULT_COLOR_IN_MAX, DEFAULT_COLOR_OUT_MAX);
+			var settings = new Settings(DefaultTargetFreq, DefaultDmaChannel);
+			settings.SetGammaCorrection(DefaultGammaCorrection, DefaultColorInMax, DefaultColorOutMax);
 
 			return settings;
 		}
@@ -79,7 +73,7 @@ namespace rpi_ws281x
 			if (gamma >= 1.0f)
 			{
 				GammaCorrection = Enumerable.Range(0, max_in)
-					.Select(i => (byte)(Math.Pow((float)i / (float)max_in, gamma) * max_out + 0.5)).ToList();
+					.Select(i => (byte)(Math.Pow(i / (float)max_in, gamma) * max_out + 0.5)).ToList();
 			}
 			else
 			{
@@ -103,10 +97,9 @@ namespace rpi_ws281x
 			byte brightness = 255, 
 			bool invert = false)
 		{
-			int channelNumber = (controllerType == ControllerType.PWM1) ? 1 : 0;
-			Controllers[channelNumber] = new Controller(ledCount, pin, brightness, invert, stripType, controllerType);
+			Controller = new Controller(ledCount, pin, brightness, invert, stripType, controllerType);
 		
-			return Controllers[channelNumber];
+			return Controller;
 		}
 
 		/// <summary>
@@ -130,7 +123,7 @@ namespace rpi_ws281x
 					break;
 
 				case ControllerType.PWM1:
-					controller = AddController(ledCount, Pin.Gpio13, stripType, controllerType, brightness, invert);
+					controller = AddController(ledCount, Pin.Gpio19, stripType, controllerType, brightness, invert);
 					break;
 
 				case ControllerType.PCM:
@@ -141,6 +134,8 @@ namespace rpi_ws281x
 					controller = AddController(ledCount, Pin.Gpio10, stripType, controllerType, brightness, invert);
 					break;
 			}
+
+			Controller = controller;
 			return controller;
 		}
 
@@ -157,18 +152,13 @@ namespace rpi_ws281x
 		/// <summary>
 		/// Returns the channels which holds the LEDs
 		/// </summary>
-		internal Dictionary<int,Controller> Controllers { get; private set; }
+		internal Controller Controller { get; private set; }
 
 		/// <summary>
 		/// Returns the Gamma Corrections Map
 		/// </summary>
 		internal List<Byte> GammaCorrection { get; private set; }
 
-        #region Obsolete
 
-        [Obsolete("Accessing Channels directly is deprecated, please use AddController() instead.")]
-        public ChannelCollection Channels { get; private set; }
-
-        #endregion
     }
 }
