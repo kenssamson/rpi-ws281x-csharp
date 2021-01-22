@@ -8,15 +8,27 @@ namespace CoreTestApp
 {
     public class ColorWipe : IAnimation
     {
-        public void Execute(AbortRequest request)
+        public void Execute(AbortRequest request, int gpioPin)
         {
+            var pin = Pin.Gpio18;
+            if (gpioPin == 19) {
+                pin = Pin.Gpio19;
+            }
+
+            if (gpioPin == 10) {
+                pin = Pin.Gpio10;
+            }
+
+            if (gpioPin == 21) {
+                pin = Pin.Gpio21;
+            }
             Console.Clear();
             Console.Write("How many LEDs do you want to use: ");
 
             var ledCount = Int32.Parse(Console.ReadLine());
             var settings = Settings.CreateDefaultSettings();
 
-            var controller = settings.AddController(ledCount, Pin.Gpio18, StripType.WS2811_STRIP_RGB);
+            settings.AddController(ledCount, pin, StripType.WS2811_STRIP_RGB);
             using (var device = new WS281x(settings))
             {
                 while (!request.IsAbortRequested)

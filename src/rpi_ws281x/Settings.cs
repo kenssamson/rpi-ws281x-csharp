@@ -97,6 +97,18 @@ namespace rpi_ws281x
 			byte brightness = 255, 
 			bool invert = false)
 		{
+			if (pin == Pin.Gpio10) {
+				controllerType = ControllerType.SPI;
+			}
+
+			if (pin == Pin.Gpio19) {
+				controllerType = ControllerType.PWM1;
+			}
+
+			if (pin == Pin.Gpio21) {
+				controllerType = ControllerType.PCM;
+			}
+			
 			Controller = new Controller(ledCount, pin, brightness, invert, stripType, controllerType);
 		
 			return Controller;

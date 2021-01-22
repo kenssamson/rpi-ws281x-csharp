@@ -17,6 +17,7 @@ namespace CoreTestApp
             };
 
             var input = 0;
+            var input2 = 18;
             do
             {
                 Console.Clear();
@@ -26,12 +27,21 @@ namespace CoreTestApp
                 Console.WriteLine("2 - Rainbow color animation" + Environment.NewLine);
                 Console.WriteLine("Press CTRL+C to abort current test." + Environment.NewLine);
                 Console.Write("What is your choice: ");
-                input = Int32.Parse(Console.ReadLine());
+                input = int.Parse(Console.ReadLine());
+                
+                Console.WriteLine("What GPIO do you want to test:" + Environment.NewLine);
+                Console.WriteLine("0 - Exit");
+                Console.WriteLine("18 - PWM_0");
+                Console.WriteLine("19 - PWM_1" + Environment.NewLine);
+                Console.WriteLine("10 - SPI/MOSI" + Environment.NewLine);
+                Console.WriteLine("Press CTRL+C to abort current test." + Environment.NewLine);
+                Console.Write("What is your choice: ");
+                input2 = int.Parse(Console.ReadLine());
 
                 if (animations.ContainsKey(input))
                 {
                     abort.IsAbortRequested = false;
-                    animations[input].Execute(abort);
+                    animations[input].Execute(abort, input2);
                 }
                 
             } while (input != 0);

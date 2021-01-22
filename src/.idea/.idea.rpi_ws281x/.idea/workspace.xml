@@ -28,7 +28,11 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="194c8936-272a-47dc-a2f5-d254ebdac1e5" name="Default Changelist" comment="" />
+    <list default="true" id="194c8936-272a-47dc-a2f5-d254ebdac1e5" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/StandardTestApp/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/StandardTestApp/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/StandardTestApp/RainbowColorAnimation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/StandardTestApp/RainbowColorAnimation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpi_ws281x/Settings.cs" beforeDir="false" afterPath="$PROJECT_DIR$/rpi_ws281x/Settings.cs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -39,7 +43,6 @@
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/StandardTestApp/ColorWipe.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/TestApp/Properties/AssemblyInfo.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
@@ -48,8 +51,10 @@
         <option value="$PROJECT_DIR$/rpi_ws281x/Pin.cs" />
         <option value="$PROJECT_DIR$/rpi_ws281x/Controller.cs" />
         <option value="$PROJECT_DIR$/rpi_ws281x/WS281x.cs" />
-        <option value="$PROJECT_DIR$/rpi_ws281x/Settings.cs" />
         <option value="$PROJECT_DIR$/rpi_ws281x/WS281xException.cs" />
+        <option value="$PROJECT_DIR$/StandardTestApp/Program.cs" />
+        <option value="$PROJECT_DIR$/StandardTestApp/RainbowColorAnimation.cs" />
+        <option value="$PROJECT_DIR$/rpi_ws281x/Settings.cs" />
       </list>
     </option>
   </component>
@@ -111,7 +116,7 @@
       <option name="presentableId" value="Default" />
       <updated>1611251647898</updated>
       <workItem from="1611251666054" duration="674000" />
-      <workItem from="1611269879582" duration="3316000" />
+      <workItem from="1611269879582" duration="3983000" />
     </task>
     <servers />
   </component>

@@ -2,6 +2,6 @@ namespace CoreTestApp
 {
     public interface IAnimation
     {
-         void Execute(AbortRequest request);
+         void Execute(AbortRequest request, int gpioPin);
     }
 }
