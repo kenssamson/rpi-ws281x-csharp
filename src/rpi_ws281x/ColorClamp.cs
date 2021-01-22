@@ -2,7 +2,7 @@
 using System.Drawing;
 
 namespace rpi_ws281x {
-    public static class ColorUtil {
+    public static class ColorClamp {
         /// <summary>
         /// Converts a normal color to one that can be used by RGB+W Strips properly
         /// </summary>

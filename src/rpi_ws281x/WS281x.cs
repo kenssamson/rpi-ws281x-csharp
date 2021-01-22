@@ -15,7 +15,6 @@ namespace rpi_ws281x {
 		private ws2811_t _ws2811;
 		private GCHandle _ws2811Handle;
 		private readonly Controller _controller;
-
 		private bool _isDisposingAllowed;
 
 		/// <summary>
@@ -88,6 +87,45 @@ namespace rpi_ws281x {
 		}
 
 		/// <summary>
+		/// Returns the controller's current brightness
+		/// (0-255)
+		/// </summary>
+		/// <returns></returns>
+		public int GetBrightness() {
+			return _controller.Brightness;
+		}
+
+		/// <summary>
+		/// Update the strip's brightness
+		/// </summary>
+		/// <param name="brightness">New brightness (0-255)</param>
+		public void SetBrightness(int brightness) {
+			_controller.Brightness = (byte) brightness;
+			if (_controller.ControllerType == ControllerType.PWM1) {
+				_ws2811.channel_1.brightness = (byte)brightness;
+			} else {
+				_ws2811.channel_0.brightness = (byte)brightness;
+			}
+
+			_controller.IsDirty = true;
+			Render();
+		}
+		
+		/// <summary>
+		/// Update the number of LEDs in the strip
+		/// </summary>
+		/// <param name="ledCount">New number of leds</param>
+		public void SetLedCount(int ledCount) {
+			_controller.LEDCount = ledCount;
+			if (_controller.ControllerType == ControllerType.PWM1) {
+				_ws2811.channel_1.count = ledCount;
+			} else {
+				_ws2811.channel_0.count = ledCount;
+			}
+			Render();
+		}
+
+		/// <summary>
 		///     Set all LEDs (on all controllers) to the same color.
 		/// </summary>
 		/// <param name="color">color to display</param>
@@ -95,7 +133,7 @@ namespace rpi_ws281x {
 			// If our strip type has a white component, adjust the color value so it renders correctly
 			var cName = _controller.StripType.ToString();
 			if (cName.Contains("W") && cName.Contains("SK")) {
-				color = ColorUtil.ClampAlpha(color);
+				color = ColorClamp.ClampAlpha(color);
 			}
 
 			_controller.SetAll(color);
@@ -103,10 +141,16 @@ namespace rpi_ws281x {
 			Render(true);
 		}
 
+		/// <summary>
+		/// Set the color of a particular LED directly.
+		/// You will need to call Render to update the colors.
+		/// </summary>
+		/// <param name="ledId">THe index of the LED to update</param>
+		/// <param name="color">The color to update the LED to</param>
 		public void SetLed(int ledId, Color color) {
 			var cName = _controller.StripType.ToString();
 			if (cName.Contains("W") && cName.Contains("SK")) {
-				color = ColorUtil.ClampAlpha(color);
+				color = ColorClamp.ClampAlpha(color);
 			}
 
 			_controller.SetLED(ledId, color);
