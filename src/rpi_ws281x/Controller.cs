@@ -28,7 +28,7 @@ namespace rpi_ws281x {
 			// If our strip type has a white component, adjust the color value so it renders correctly
 			var cName = StripType.ToString();
 			if (cName.Contains("W") && cName.Contains("SK")) {
-				color = ColorUtil.ClampAlpha(color);
+				color = ColorClamp.ClampAlpha(color);
 			}
 
 			LEDColors[ledID].Color = color;
@@ -43,7 +43,7 @@ namespace rpi_ws281x {
 			// If our strip type has a white component, adjust the color value so it renders correctly
 			var cName = StripType.ToString();
 			if (cName.Contains("W") && cName.Contains("SK")) {
-				color = ColorUtil.ClampAlpha(color);
+				color = ColorClamp.ClampAlpha(color);
 			}
 
 			LEDColors.ForEach(led => led.Color = color);
@@ -105,7 +105,13 @@ namespace rpi_ws281x {
 		/// <summary>
 		/// The number of LEDs in the strip
 		/// </summary>
-		public int LEDCount => LEDColors.Count;
+		public int LEDCount {
+			get => LEDColors.Count;
+			set {
+				LEDColors = Enumerable.Range(0, value).Select(x => new LED()).ToList();
+				IsDirty = true;
+			}
+		}
 
 		/// <summary>
 		/// The type of controller (i.e. PWM, PCM, SPI  )
