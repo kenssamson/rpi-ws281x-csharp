@@ -16,4 +16,14 @@ namespace rpi_ws281x
         
         Gpio31 = 31
     }
+
+    public enum PinController {
+        Gpio10 = ControllerType.SPI,
+        Gpio12 = ControllerType.SPI,
+        Gpio13 = ControllerType.PWM1,
+        Gpio18 = ControllerType.PWM0,
+        Gpio19 = ControllerType.PWM1,
+        Gpio21 = ControllerType.PCM,
+        Gpio31 = ControllerType.PCM
+    }
 }

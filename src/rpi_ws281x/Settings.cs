@@ -1,7 +1,5 @@
-﻿using Native;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace rpi_ws281x
@@ -48,10 +46,10 @@ namespace rpi_ws281x
 		/// Use a frequency of 800000 Hz and DMA channel 10
 		/// Gamma Correction factor of 2.8 and 256 colors.
 		/// </summary>
-		public static Settings CreateDefaultSettings()
+		public static Settings CreateDefaultSettings(bool setGamma=true)
 		{
 			var settings = new Settings(DefaultTargetFreq, DefaultDmaChannel);
-			settings.SetGammaCorrection(DefaultGammaCorrection, DefaultColorInMax, DefaultColorOutMax);
+			if (setGamma) settings.SetGammaCorrection(DefaultGammaCorrection, DefaultColorInMax, DefaultColorOutMax);
 
 			return settings;
 		}
@@ -88,29 +86,14 @@ namespace rpi_ws281x
 		/// <param name="ledCount">number of LEDs</param>
 		/// <param name="pin">GPIO pin used to controller strip</param>
 		/// <param name="stripType">type of strip</param>
-		/// <param name="controllerType">type of controller - should be supported by selected pin</param>
 		/// <param name="brightness">maximum brightness for LEDs</param>
 		/// <param name="invert">true if signal should be inverted because polarity is reversed</param>
 		public Controller AddController(int ledCount, Pin pin, 
 			StripType stripType = StripType.Unknown, 
-			ControllerType controllerType = ControllerType.PWM0, 
 			byte brightness = 255, 
-			bool invert = false)
-		{
-			if (pin == Pin.Gpio10) {
-				controllerType = ControllerType.SPI;
-			}
-
-			if (pin == Pin.Gpio19) {
-				controllerType = ControllerType.PWM1;
-			}
-
-			if (pin == Pin.Gpio21) {
-				controllerType = ControllerType.PCM;
-			}
-			
+			bool invert = false) {
+			if (!Enum.TryParse(pin.ToString(), out ControllerType controllerType)) controllerType = ControllerType.PWM0;
 			Controller = new Controller(ledCount, pin, brightness, invert, stripType, controllerType);
-		
 			return Controller;
 		}
 
@@ -127,23 +110,26 @@ namespace rpi_ws281x
 			byte brightness = 255, 
 			bool invert = false)
 		{
-			Controller controller = null;
+			Controller controller;
 			switch (controllerType)
 			{
 				case ControllerType.PWM0:
-					controller = AddController(ledCount, Pin.Gpio18, stripType, controllerType, brightness, invert);
+					controller = AddController(ledCount, Pin.Gpio18, stripType, brightness, invert);
 					break;
 
 				case ControllerType.PWM1:
-					controller = AddController(ledCount, Pin.Gpio19, stripType, controllerType, brightness, invert);
+					controller = AddController(ledCount, Pin.Gpio19, stripType,  brightness, invert);
 					break;
 
 				case ControllerType.PCM:
-					controller = AddController(ledCount, Pin.Gpio21, stripType, controllerType, brightness, invert);
+					controller = AddController(ledCount, Pin.Gpio21, stripType, brightness, invert);
 					break;
 
 				case ControllerType.SPI:
-					controller = AddController(ledCount, Pin.Gpio10, stripType, controllerType, brightness, invert);
+					controller = AddController(ledCount, Pin.Gpio10, stripType, brightness, invert);
+					break;
+				default:
+					controller = AddController(ledCount, Pin.Gpio18, stripType, brightness, invert);
 					break;
 			}
 
