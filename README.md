@@ -1,7 +1,9 @@
-[![Nuget](https://img.shields.io/nuget/v/kenssamson.rpi-ws281x-csharp.svg?label=version&style=popout)](ReleaseNotes.md)
+[![Nuget](https://img.shields.io/nuget/v/digitalhigh.rpi-ws281x-csharp.svg?label=version&style=popout)](ReleaseNotes.md)
 ![Framework](https://img.shields.io/static/v1.svg?label=.NET&nbsp;Standard&message=v2.0&color=blue)
+![Framework](https://img.shields.io/static/v1.svg?label=.NET&nbsp;Standard&message=v2.1&color=blue)
+![Framework](https://img.shields.io/static/v1.svg?label=.NET&message=v5.0&color=blue)
 [![License](https://img.shields.io/badge/License-BSD%202--Clause-orange.svg)](https://opensource.org/licenses/BSD-2-Clause)
-[![Nuget](https://img.shields.io/nuget/dt/kenssamson.rpi-ws281x-csharp.svg?color=brightgreen&style=popout)](https://www.nuget.org/packages/digitalhigh.rpi-ws281x-csharp/)
+[![Nuget](https://img.shields.io/nuget/dt/digitalhigh.rpi-ws281x-csharp.svg?color=brightgreen&style=popout)](https://www.nuget.org/packages/digitalhigh.rpi-ws281x-csharp/)
 
 # rpi-ws281x-csharp
 This fork contains the following changes:
@@ -60,7 +62,7 @@ using (var rpi = new WS281x(settings))
 Please have a look at the [example program](src/CoreTestApp/Program.cs) and get familiar with the usage.
 
 ## Installation
-The library can be downloaded from NuGet: [![Nuget](https://img.shields.io/nuget/v/kenssamson.rpi-ws281x-csharp.svg?style=popout)](https://www.nuget.org/packages/digitalhigh.rpi-ws281x-csharp)
+The library can be downloaded from NuGet: [![Nuget](https://img.shields.io/nuget/v/digitalhigh.rpi-ws281x-csharp.svg?style=popout)](https://www.nuget.org/packages/digitalhigh.rpi-ws281x-csharp)
 
 **Package Manager**
 > PM\> Install-Package digitalhigh.rpi-ws281x-csharp
