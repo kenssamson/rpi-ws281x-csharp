@@ -9,12 +9,12 @@
   <PropertyGroup Label="Package">
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageId>digitalhigh.rpi-ws281x-csharp</PackageId>
-    <PackageVersion>1.1.3</PackageVersion>
-    <Authors>Ken Samson</Authors>
+    <PackageVersion>1.1.4</PackageVersion>
+    <Authors>Digitalhigh</Authors>
     <Company />
     <Title>.Net Library wrapper for the rpi-ws281x library</Title>
     <Product>.Net Library wrapper for the rpi-ws281x library</Product>
-    <Description>This is a fork of the original .Net Library. It has been updated to work properly with .Net Core 2.2 and contains additional features.</Description>
+    <Description>This is a fork of the original .Net Library. It has been updated to work properly with .Net Core 2.2, .Net 5.0, and contains additional features and improvements.</Description>
     <Copyright>Copyright © 2021 Digitalhigh</Copyright>
     <PackageLicenseExpression>BSD-2-Clause</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/d8ahazard/rpi-ws281x-csharp.git</RepositoryUrl>

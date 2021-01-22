@@ -22,7 +22,7 @@ namespace rpi_ws281x {
 		/// </summary>
 		/// <param name="settings">Settings used for initialization</param>
 		public WS281x(Settings settings) {
-			if (settings.Controller.ControllerType == ControllerType.PWM1) {
+			if (settings.Controller.Pin == Pin.Gpio19 || settings.Controller.Pin == Pin.Gpio13) {
 				_ws2811 = new ws2811_t {
 					dmanum = settings.DMAChannel,
 					freq = settings.Frequency,
@@ -109,6 +109,10 @@ namespace rpi_ws281x {
 
 			_controller.IsDirty = true;
 			Render();
+		}
+
+		public int GetLedCount() {
+			return _controller.LEDCount;
 		}
 		
 		/// <summary>

@@ -28,7 +28,11 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="194c8936-272a-47dc-a2f5-d254ebdac1e5" name="Default Changelist" comment="" />
+    <list default="true" id="194c8936-272a-47dc-a2f5-d254ebdac1e5" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.rpi_ws281x/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.rpi_ws281x/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpi_ws281x/WS281x.cs" beforeDir="false" afterPath="$PROJECT_DIR$/rpi_ws281x/WS281x.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpi_ws281x/rpi_ws281x.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/rpi_ws281x/rpi_ws281x.csproj" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -51,9 +55,9 @@
         <option value="$PROJECT_DIR$/StandardTestApp/IAnimation.cs" />
         <option value="$PROJECT_DIR$/rpi_ws281x/Pin.cs" />
         <option value="$PROJECT_DIR$/rpi_ws281x/Controller.cs" />
-        <option value="$PROJECT_DIR$/rpi_ws281x/WS281x.cs" />
         <option value="$PROJECT_DIR$/rpi_ws281x/Settings.cs" />
         <option value="$PROJECT_DIR$/rpi_ws281x/ColorClamp.cs" />
+        <option value="$PROJECT_DIR$/rpi_ws281x/WS281x.cs" />
       </list>
     </option>
   </component>
@@ -116,7 +120,7 @@
       <option name="presentableId" value="Default" />
       <updated>1611251647898</updated>
       <workItem from="1611251666054" duration="674000" />
-      <workItem from="1611269879582" duration="11642000" />
+      <workItem from="1611269879582" duration="17571000" />
     </task>
     <servers />
   </component>
