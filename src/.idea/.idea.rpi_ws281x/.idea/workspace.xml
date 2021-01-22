@@ -28,17 +28,7 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="194c8936-272a-47dc-a2f5-d254ebdac1e5" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.rpi_ws281x/.idea/contentModel.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.rpi_ws281x/.idea/contentModel.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.rpi_ws281x/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.rpi_ws281x/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/StandardTestApp/StandardTestApp.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/StandardTestApp/StandardTestApp.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpi_ws281x/ColorUtil.cs" beforeDir="false" afterPath="$PROJECT_DIR$/rpi_ws281x/ColorClamp.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpi_ws281x/Controller.cs" beforeDir="false" afterPath="$PROJECT_DIR$/rpi_ws281x/Controller.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpi_ws281x/Pin.cs" beforeDir="false" afterPath="$PROJECT_DIR$/rpi_ws281x/Pin.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpi_ws281x/Settings.cs" beforeDir="false" afterPath="$PROJECT_DIR$/rpi_ws281x/Settings.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpi_ws281x/WS281x.cs" beforeDir="false" afterPath="$PROJECT_DIR$/rpi_ws281x/WS281x.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpi_ws281x/rpi_ws281x.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/rpi_ws281x/rpi_ws281x.csproj" afterDir="false" />
-    </list>
+    <list default="true" id="194c8936-272a-47dc-a2f5-d254ebdac1e5" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -126,7 +116,7 @@
       <option name="presentableId" value="Default" />
       <updated>1611251647898</updated>
       <workItem from="1611251666054" duration="674000" />
-      <workItem from="1611269879582" duration="10885000" />
+      <workItem from="1611269879582" duration="11642000" />
     </task>
     <servers />
   </component>
