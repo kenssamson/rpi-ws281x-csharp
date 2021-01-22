@@ -73,7 +73,9 @@ namespace rpi_ws281x {
 
 			if (force || _controller.IsDirty) {
 				var ledColor = _controller.GetColors(true);
-				Marshal.Copy(ledColor, 0, _ws2811.channel_0.leds, ledColor.Length);
+				Marshal.Copy(ledColor, 0, _controller.ControllerType == ControllerType.PWM1
+					? _ws2811.channel_1.leds
+					: _ws2811.channel_0.leds, ledColor.Length);
 				shouldRender = true;
 			}
 
