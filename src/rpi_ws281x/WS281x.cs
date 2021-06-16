@@ -90,20 +90,60 @@ namespace rpi_ws281x
 			}
 		}
 
+		
 		/// <summary>
-		/// Set all LEDs (on all controllers) to the same color.
+		/// Get the brightness of a controller
 		/// </summary>
-		/// <param name="color">color to display</param>
-		public void SetAll(Color color)
-		{
-			foreach (var controller in _controllers.Values)
-			{
-				controller.SetAll(color);
-				controller.IsDirty = false;
-			}
-			Render(true);
+		/// <param name="controllerId">The ID of the controller (0 or 1)</param>
+		/// <returns></returns>
+		public int GetBrightness(int controllerId = 0) {
+			if (!_controllers.ContainsKey(controllerId)) return 0;
+			var controller = _controllers[controllerId];
+			return controller.Brightness;
 		}
 
+		/// <summary>
+		/// Update the strip's brightness
+		/// </summary>
+		/// <param name="brightness">New brightness (0-255)</param>
+		/// /// <param name="controllerId">The ID of the controller (0 or 1)</param>
+		public void SetBrightness(int brightness, int controllerId = 0) {
+			if (!_controllers.ContainsKey(controllerId)) return;
+			var controller = _controllers[controllerId];
+
+			controller.Brightness = (byte) brightness;
+			if (controller.ControllerType == ControllerType.PWM1) {
+				_ws2811.channel_1.brightness = (byte)brightness;
+			} else {
+				_ws2811.channel_0.brightness = (byte)brightness;
+			}
+
+			controller.IsDirty = true;
+			Render();
+		}
+
+		public int GetLedCount(int controllerId) {
+			if (!_controllers.ContainsKey(controllerId)) return 0;
+			var controller = _controllers[controllerId];
+			return controller.LEDCount;
+		}
+
+		/// <summary>
+		/// Update the number of LEDs in the strip
+		/// </summary>
+		/// <param name="ledCount">New number of leds</param>
+		/// <param name="controllerId">The ID of the controller (0 or 1)</param>
+		public void SetLedCount(int ledCount, int controllerId = 0) {
+			if (!_controllers.ContainsKey(controllerId)) return;
+			var controller = _controllers[controllerId];
+			controller.LEDCount = ledCount;
+			if (controller.ControllerType == ControllerType.PWM1) {
+				_ws2811.channel_1.count = ledCount;
+			} else {
+				_ws2811.channel_0.count = ledCount;
+			}
+			Render();
+		}
 		/// <summary>
 		/// Clear all LEDs
 		/// </summary>

@@ -28,8 +28,11 @@ namespace rpi_ws281x
 		/// </summary>
 		/// <param name="ledID">LED to set (0 based)</param>
 		/// <param name="color">Color to use</param>
-		public void SetLED(int ledID, Color color)
-		{
+		public void SetLED(int ledID, Color color) {
+			var cName = StripType.ToString();
+			if (cName.Contains("W") && cName.Contains("SK")) {
+				color = ColorClamp.ClampAlpha(color);
+			}
 			LEDColors[ledID].Color = color;
 			IsDirty = true;
 		}
@@ -38,11 +41,16 @@ namespace rpi_ws281x
 		/// Set all the LEDs in the strip to same color
 		/// </summary>
 		/// <param name="color">color to set all the LEDs</param>
-		public void SetAll(Color color)
-		{
+		public void SetAll(Color color) {
+			var cName = StripType.ToString();
+			if (cName.Contains("W") && cName.Contains("SK")) {
+				color = ColorClamp.ClampAlpha(color);
+			}
 			LEDColors.ForEach(led => led.Color = color);
 			IsDirty = true;
 		}
+		
+		
 
 		/// <summary>
 		/// Turn off all the LEDs in the strip
@@ -101,8 +109,14 @@ namespace rpi_ws281x
 		/// <summary>
 		/// The number of LEDs in the strip
 		/// </summary>
-        public int LEDCount => LEDColors.Count;
-		
+        public int LEDCount {
+			get => LEDColors.Count;
+			set {
+				LEDColors = Enumerable.Range(0, value).Select(x => new LED()).ToList();
+				IsDirty = true;
+			}
+		}
+
 		/// <summary>
 		/// The type of controller (i.e. PWM, PCM, SPI  )
 		/// </summary>

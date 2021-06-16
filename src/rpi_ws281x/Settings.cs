@@ -41,11 +41,6 @@ namespace rpi_ws281x
 			Frequency = frequency;
 			DMAChannel = dmaChannel;
 			Controllers = new Dictionary<int, Controller>(PInvoke.RPI_PWM_CHANNELS);
-
-            #pragma warning disable 618
-            Channels = new ChannelCollection(Controllers);
-            #pragma warning restore 618
-
             GammaCorrection = null;		
 		}
 
@@ -54,10 +49,10 @@ namespace rpi_ws281x
 		/// Use a frequency of 800000 Hz and DMA channel 10
 		/// Gamma Correction factor of 2.8 and 256 colors.
 		/// </summary>
-		public static Settings CreateDefaultSettings()
+		public static Settings CreateDefaultSettings(bool setGamma=true)
 		{
 			var settings = new Settings(DEFAULT_TARGET_FREQ, DEFAULT_DMA_CHANNEL);
-			settings.SetGammaCorrection(DEFAULT_GAMMA_CORRECTION, DEFAULT_COLOR_IN_MAX, DEFAULT_COLOR_OUT_MAX);
+			if (setGamma) settings.SetGammaCorrection(DEFAULT_GAMMA_CORRECTION, DEFAULT_COLOR_IN_MAX, DEFAULT_COLOR_OUT_MAX);
 
 			return settings;
 		}
@@ -164,11 +159,5 @@ namespace rpi_ws281x
 		/// </summary>
 		internal List<Byte> GammaCorrection { get; private set; }
 
-        #region Obsolete
-
-        [Obsolete("Accessing Channels directly is deprecated, please use AddController() instead.")]
-        public ChannelCollection Channels { get; private set; }
-
-        #endregion
     }
 }
