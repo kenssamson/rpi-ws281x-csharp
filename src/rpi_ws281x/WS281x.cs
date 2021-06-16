@@ -1,237 +1,261 @@
-﻿#region
-
+﻿using Native;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Runtime.InteropServices;
-using Native;
 
-#endregion
-
-namespace rpi_ws281x {
+namespace rpi_ws281x
+{
 	/// <summary>
-	///     Wrapper class to control WS281x LEDs
+	/// Wrapper class to controll WS281x LEDs
 	/// </summary>
-	public class WS281x : IDisposable {
+	public class WS281x : IDisposable
+	{
 		private ws2811_t _ws2811;
 		private GCHandle _ws2811Handle;
-		private readonly Controller _controller;
+		private Dictionary<int, Controller> _controllers;
+		
 		private bool _isDisposingAllowed;
 
 		/// <summary>
-		///     Initialize the wrapper
+		/// Initialize the wrapper
 		/// </summary>
 		/// <param name="settings">Settings used for initialization</param>
-		public WS281x(Settings settings) {
-			if (settings.Controller.Pin == Pin.Gpio19 || settings.Controller.Pin == Pin.Gpio13) {
-				_ws2811 = new ws2811_t {
-					dmanum = settings.DMAChannel,
-					freq = settings.Frequency,
-					channel_1 = InitChannel(settings.Controller)
-				};
-			} else {
-				_ws2811 = new ws2811_t {
-					dmanum = settings.DMAChannel,
-					freq = settings.Frequency,
-					channel_0 = InitChannel(settings.Controller)
-				};
-			}
-
-
+		public WS281x(Settings settings)
+		{
+			_ws2811 = new ws2811_t
+			{
+				dmanum = settings.DMAChannel,
+				freq = settings.Frequency,
+				channel_0 = InitChannel(0, settings.Controllers),
+				channel_1 = InitChannel(1, settings.Controllers)
+			};
+			
 			//Pin the object in memory. Otherwies GC will probably move the object to another memory location.
 			//This would cause errors because the native library has a pointer on the memory location of the object.
 			_ws2811Handle = GCHandle.Alloc(_ws2811, GCHandleType.Pinned);
 
-			var initResult = PInvoke.ws2811_init(ref _ws2811);
-			if (initResult != ws2811_return_t.WS2811_SUCCESS) {
-				throw WS281xException.Create(initResult, "initializing");
-			}
+            var initResult = PInvoke.ws2811_init(ref _ws2811);
+            if (initResult != ws2811_return_t.WS2811_SUCCESS)
+            {
+                throw WS281xException.Create(initResult, "initializing");
+            }           
 
 			// save a copy of the controllers - used to update LEDs
-			_controller = settings.Controller;
+			_controllers = new Dictionary<int, Controller>(settings.Controllers);
 
 			// if specified, apply gamma correction
-			if (settings.GammaCorrection != null) {
-				Marshal.Copy(settings.GammaCorrection.ToArray(), 0,
-					settings.Controller.ControllerType == ControllerType.PWM1
-						? _ws2811.channel_1.gamma
-						: _ws2811.channel_0.gamma,
-					settings.GammaCorrection.Count);
+            if (settings.GammaCorrection != null)
+			{
+				if (settings.Controllers.ContainsKey(0))
+                    Marshal.Copy(settings.GammaCorrection.ToArray(), 0, _ws2811.channel_0.gamma, settings.GammaCorrection.Count);
+				if (settings.Controllers.ContainsKey(1))
+                    Marshal.Copy(settings.GammaCorrection.ToArray(), 0, _ws2811.channel_1.gamma, settings.GammaCorrection.Count);
 			}
 
-			//Disposing is only allowed if the init was successful.
+			//Disposing is only allowed if the init was successfull.
 			//Otherwise the native cleanup function throws an error.
 			_isDisposingAllowed = true;
 		}
 
 		/// <summary>
-		///     Renders the content of the channels
+		/// Renders the content of the channels
 		/// </summary>
 		/// <param name="force">Force LEDs to updated - default only updates if when a change is done</param>
-		public void Render(bool force = false) {
-			var shouldRender = false;
+		public void Render(bool force = false)
+		{
+			bool shouldRender = false;
 
-			if (force || _controller.IsDirty) {
-				var ledColor = _controller.GetColors(true);
-				Marshal.Copy(ledColor, 0, _controller.ControllerType == ControllerType.PWM1
-					? _ws2811.channel_1.leds
-					: _ws2811.channel_0.leds, ledColor.Length);
+			if (_controllers.ContainsKey(0) && (force || _controllers[0].IsDirty))
+			{
+				var ledColor = _controllers[0].GetColors(true);
+				Marshal.Copy(ledColor, 0, _ws2811.channel_0.leds, ledColor.Length);
 				shouldRender = true;
 			}
-
-			if (shouldRender) {
+			if (_controllers.ContainsKey(1) && (force || _controllers[1].IsDirty))
+			{
+				var ledColor = _controllers[1].GetColors(true);
+				Marshal.Copy(ledColor, 0, _ws2811.channel_1.leds, ledColor.Length);
+				shouldRender = true;
+			}
+			
+			if (shouldRender)
+			{
 				var result = PInvoke.ws2811_render(ref _ws2811);
-				if (result != ws2811_return_t.WS2811_SUCCESS) {
+				if (result != ws2811_return_t.WS2811_SUCCESS)
+				{
 					throw WS281xException.Create(result, "rendering");
 				}
 			}
 		}
 
+		
 		/// <summary>
-		/// Returns the controller's current brightness
-		/// (0-255)
+		/// Get the brightness of a controller
 		/// </summary>
+		/// <param name="controllerId">The ID of the controller (0 or 1)</param>
 		/// <returns></returns>
-		public int GetBrightness() {
-			return _controller.Brightness;
+		public int GetBrightness(int controllerId = 0) {
+			if (!_controllers.ContainsKey(controllerId)) return 0;
+			var controller = _controllers[controllerId];
+			return controller.Brightness;
 		}
 
 		/// <summary>
 		/// Update the strip's brightness
 		/// </summary>
 		/// <param name="brightness">New brightness (0-255)</param>
-		public void SetBrightness(int brightness) {
-			_controller.Brightness = (byte) brightness;
-			if (_controller.ControllerType == ControllerType.PWM1) {
+		/// /// <param name="controllerId">The ID of the controller (0 or 1)</param>
+		public void SetBrightness(int brightness, int controllerId = 0) {
+			if (!_controllers.ContainsKey(controllerId)) return;
+			var controller = _controllers[controllerId];
+
+			controller.Brightness = (byte) brightness;
+			if (controller.ControllerType == ControllerType.PWM1) {
 				_ws2811.channel_1.brightness = (byte)brightness;
 			} else {
 				_ws2811.channel_0.brightness = (byte)brightness;
 			}
 
-			_controller.IsDirty = true;
+			controller.IsDirty = true;
 			Render();
 		}
 
-		public int GetLedCount() {
-			return _controller.LEDCount;
+		public int GetLedCount(int controllerId) {
+			if (!_controllers.ContainsKey(controllerId)) return 0;
+			var controller = _controllers[controllerId];
+			return controller.LEDCount;
 		}
-		
+
 		/// <summary>
 		/// Update the number of LEDs in the strip
 		/// </summary>
 		/// <param name="ledCount">New number of leds</param>
-		public void SetLedCount(int ledCount) {
-			_controller.LEDCount = ledCount;
-			if (_controller.ControllerType == ControllerType.PWM1) {
+		/// <param name="controllerId">The ID of the controller (0 or 1)</param>
+		public void SetLedCount(int ledCount, int controllerId = 0) {
+			if (!_controllers.ContainsKey(controllerId)) return;
+			var controller = _controllers[controllerId];
+			controller.LEDCount = ledCount;
+			if (controller.ControllerType == ControllerType.PWM1) {
 				_ws2811.channel_1.count = ledCount;
 			} else {
 				_ws2811.channel_0.count = ledCount;
 			}
 			Render();
 		}
-
 		/// <summary>
-		///     Set all LEDs (on all controllers) to the same color.
+		/// Clear all LEDs
 		/// </summary>
-		/// <param name="color">color to display</param>
-		public void SetAll(Color color) {
-			// If our strip type has a white component, adjust the color value so it renders correctly
-			var cName = _controller.StripType.ToString();
-			if (cName.Contains("W") && cName.Contains("SK")) {
-				color = ColorClamp.ClampAlpha(color);
+		public void Reset()
+		{
+			foreach (var controller in _controllers.Values)
+			{
+				controller.Reset();
+				controller.IsDirty = false;
 			}
-
-			_controller.SetAll(color);
-			_controller.IsDirty = false;
 			Render(true);
 		}
 
-		/// <summary>
-		/// Set the color of a particular LED directly.
-		/// You will need to call Render to update the colors.
-		/// </summary>
-		/// <param name="ledId">THe index of the LED to update</param>
-		/// <param name="color">The color to update the LED to</param>
-		public void SetLed(int ledId, Color color) {
-			var cName = _controller.StripType.ToString();
-			if (cName.Contains("W") && cName.Contains("SK")) {
-				color = ColorClamp.ClampAlpha(color);
+		public Controller GetController(ControllerType controllerType = ControllerType.PWM0)
+		{
+			int channelNumber = (controllerType == ControllerType.PWM1) ? 1 : 0;
+			if (_controllers.ContainsKey(channelNumber) && 
+				_controllers[channelNumber].ControllerType == controllerType)
+			{
+				return _controllers[channelNumber];
 			}
-
-			_controller.SetLED(ledId, color);
+			return null;
 		}
 
 		/// <summary>
-		///     Clear all LEDs
+		/// Initialize the channel propierties
 		/// </summary>
-		public void Reset() {
-			_controller.Reset();
-			_controller.IsDirty = false;
-			Render(true);
-		}
+		/// <param name="channelIndex">Index of the channel tu initialize</param>
+		/// <param name="controllers">Controller Settings</param>
+		private ws2811_channel_t InitChannel(int channelIndex, Dictionary<int, Controller> controllers)
+		{
+			ws2811_channel_t channel = new ws2811_channel_t();
 
-		public Controller GetController() {
-			return _controller;
-		}
+			if (controllers.ContainsKey(channelIndex))
+			{
+				channel.count		= controllers[channelIndex].LEDCount;
+				channel.gpionum		= controllers[channelIndex].GPIOPin;
+				channel.brightness	= controllers[channelIndex].Brightness;
+				channel.invert		= Convert.ToInt32(controllers[channelIndex].Invert);
 
-		/// <summary>
-		///     Initialize the channel propierties
-		/// </summary>
-		/// <param name="controller">Controller Settings</param>
-		private ws2811_channel_t InitChannel(Controller controller) {
-			var channel = new ws2811_channel_t {
-				count = controller.LEDCount,
-				gpionum = controller.GPIOPin,
-				brightness = controller.Brightness,
-				invert = Convert.ToInt32(controller.Invert)
-			};
-
-			if (controller.StripType != StripType.Unknown) {
-				//Strip type is set by the native assembly if not explicitly set.
-				//This type defines the ordering of the colors e. g. RGB or GRB, ...
-				channel.strip_type = (int) controller.StripType;
+				if (controllers[channelIndex].StripType != StripType.Unknown)
+				{
+					//Strip type is set by the native assembly if not explicitly set.
+					//This type defines the ordering of the colors e. g. RGB or GRB, ...
+					channel.strip_type = (int)controllers[channelIndex].StripType;
+				}
 			}
-
 			return channel;
 		}
 
-		#region IDisposable Support
+        #region Obsolete
 
-		private bool disposedValue; // To detect redundant calls
+		[Obsolete("GetMessageForStatusCode is depreciated. Returned string is mangled due to ANSI/UNICODE conversion. Use WS281xException.GetErrorMessage(...) instead.")]
+		public string GetMessageForStatusCode(ws2811_return_t statusCode)
+		{
+			var strPointer = PInvoke.ws2811_get_return_t_str((int)statusCode);
+			return Marshal.PtrToStringAuto(strPointer);
+		}
 
-		protected virtual void Dispose(bool disposing) {
-			if (!disposedValue) {
-				if (disposing) {
+        [Obsolete("SetLEDColor is depreciated, please use GetController(controllerType).SetLED(ledID,color) instead")]
+        public void SetLEDColor(int channelIndex, int ledID, Color color)
+        {
+            if (_controllers.ContainsKey(channelIndex))
+            {
+                _controllers[channelIndex].SetLED(ledID, color);
+            }
+        }
+
+        #endregion
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!disposedValue)
+			{
+				if (disposing)
+				{
 					// TODO: dispose managed state (managed objects).
 				}
 
 				// TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
 				// TODO: set large fields to null.
 
-				if (_isDisposingAllowed) {
+				if(_isDisposingAllowed)
+				{
 					PInvoke.ws2811_fini(ref _ws2811);
 					_ws2811Handle.Free();
-
+										
 					_isDisposingAllowed = false;
 				}
-
+				
 				disposedValue = true;
 			}
 		}
 
 		// TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
-		~WS281x() {
+		~WS281x()
+		{
 			// Do not change this code. Put cleanup code in Dispose(bool disposing) above.
 			Dispose(false);
 		}
 
 		// This code added to correctly implement the disposable pattern.
-		public void Dispose() {
+		public void Dispose()
+		{
 			// Do not change this code. Put cleanup code in Dispose(bool disposing) above.
 			Dispose(true);
 			// TODO: uncomment the following line if the finalizer is overridden above.
 			// GC.SuppressFinalize(this);
 		}
-
-		#endregion
+	#endregion
 	}
 }

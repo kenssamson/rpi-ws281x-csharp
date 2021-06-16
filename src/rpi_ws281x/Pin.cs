@@ -3,27 +3,29 @@ namespace rpi_ws281x
     public enum Pin : int
     {
         Gpio10 = 10,
-        
-        Gpio12 = 12,
-        
-        Gpio13 = 13,
-        
-        Gpio18 = 18,
-        
-        Gpio19 = 19,
-        
-        Gpio21 = 21,
-        
-        Gpio31 = 31
-    }
+        Phys19 = 10,
+        WiPi12 = 10,
 
-    public enum PinController {
-        Gpio10 = ControllerType.SPI,
-        Gpio12 = ControllerType.SPI,
-        Gpio13 = ControllerType.PWM1,
-        Gpio18 = ControllerType.PWM0,
-        Gpio19 = ControllerType.PWM1,
-        Gpio21 = ControllerType.PCM,
-        Gpio31 = ControllerType.PCM
+        Gpio12 = 12,
+        Phys32 = 12,
+        WiPi26 = 12,
+
+        Gpio13 = 13,
+        Phys33 = 13,
+        WiPi23 = 13,
+
+        Gpio18 = 18,
+        Phys12 = 18,
+        WiPi1 = 18,
+
+        Gpio19 = 19,
+        Phys35 = 19,
+        WiPi24 = 19,
+
+        Gpio21 = 21,
+        Phys40 = 21,
+        WiPi29 = 21,
+
+        Gpio31 = 31
     }
 }

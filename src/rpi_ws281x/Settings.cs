@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Native;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace rpi_ws281x
@@ -9,25 +11,25 @@ namespace rpi_ws281x
 	/// </summary>
 	public class Settings
 	{
-		public static readonly uint DefaultTargetFreq = 800000;
-		public static readonly int DefaultDmaChannel = 10;
+		public static readonly uint DEFAULT_TARGET_FREQ = 800000;
+		public static readonly int DEFAULT_DMA_CHANNEL = 10;
 
 		/// <summary>
 		/// Gamma Correction Factor 
 		/// 1.0 = no correction, higher values result in dimmer midrange colors
 		/// </summary>
-		private static readonly float DefaultGammaCorrection = 2.8f;
+		public static readonly float DEFAULT_GAMMA_CORRECTION = 2.8f;
 
 		/// <summary>
 		/// Number of Colors (0 based) used in code (default is 255 - 8-bit colors)
 		/// </summary>
-		private static readonly int DefaultColorInMax = 255;
+		public static readonly int DEFAULT_COLOR_IN_MAX = 255;
 
 		/// <summary>
 		/// Number of Colors (0 based) used by strip. Default (255) is for 8-bit color strips.
 		/// Some strips, like LD8806 use 7-bit so 127 should be used instead of default
 		/// </summary>
-		private static readonly int DefaultColorOutMax = 255;
+		public static readonly int DEFAULT_COLOR_OUT_MAX = 255;
 		
 		/// <summary>
 		/// Settings to initialize the WS281x controller
@@ -38,7 +40,8 @@ namespace rpi_ws281x
 		{
 			Frequency = frequency;
 			DMAChannel = dmaChannel;
-			GammaCorrection = null;		
+			Controllers = new Dictionary<int, Controller>(PInvoke.RPI_PWM_CHANNELS);
+            GammaCorrection = null;		
 		}
 
 		/// <summary>
@@ -48,8 +51,8 @@ namespace rpi_ws281x
 		/// </summary>
 		public static Settings CreateDefaultSettings(bool setGamma=true)
 		{
-			var settings = new Settings(DefaultTargetFreq, DefaultDmaChannel);
-			if (setGamma) settings.SetGammaCorrection(DefaultGammaCorrection, DefaultColorInMax, DefaultColorOutMax);
+			var settings = new Settings(DEFAULT_TARGET_FREQ, DEFAULT_DMA_CHANNEL);
+			if (setGamma) settings.SetGammaCorrection(DEFAULT_GAMMA_CORRECTION, DEFAULT_COLOR_IN_MAX, DEFAULT_COLOR_OUT_MAX);
 
 			return settings;
 		}
@@ -71,7 +74,7 @@ namespace rpi_ws281x
 			if (gamma >= 1.0f)
 			{
 				GammaCorrection = Enumerable.Range(0, max_in)
-					.Select(i => (byte)(Math.Pow(i / (float)max_in, gamma) * max_out + 0.5)).ToList();
+					.Select(i => (byte)(Math.Pow((float)i / (float)max_in, gamma) * max_out + 0.5)).ToList();
 			}
 			else
 			{
@@ -86,15 +89,19 @@ namespace rpi_ws281x
 		/// <param name="ledCount">number of LEDs</param>
 		/// <param name="pin">GPIO pin used to controller strip</param>
 		/// <param name="stripType">type of strip</param>
+		/// <param name="controllerType">type of controller - should be supported by selected pin</param>
 		/// <param name="brightness">maximum brightness for LEDs</param>
 		/// <param name="invert">true if signal should be inverted because polarity is reversed</param>
 		public Controller AddController(int ledCount, Pin pin, 
 			StripType stripType = StripType.Unknown, 
+			ControllerType controllerType = ControllerType.PWM0, 
 			byte brightness = 255, 
-			bool invert = false) {
-			if (!Enum.TryParse(pin.ToString(), out ControllerType controllerType)) controllerType = ControllerType.PWM0;
-			Controller = new Controller(ledCount, pin, brightness, invert, stripType, controllerType);
-			return Controller;
+			bool invert = false)
+		{
+			int channelNumber = (controllerType == ControllerType.PWM1) ? 1 : 0;
+			Controllers[channelNumber] = new Controller(ledCount, pin, brightness, invert, stripType, controllerType);
+		
+			return Controllers[channelNumber];
 		}
 
 		/// <summary>
@@ -110,30 +117,25 @@ namespace rpi_ws281x
 			byte brightness = 255, 
 			bool invert = false)
 		{
-			Controller controller;
+			Controller controller = null;
 			switch (controllerType)
 			{
 				case ControllerType.PWM0:
-					controller = AddController(ledCount, Pin.Gpio18, stripType, brightness, invert);
+					controller = AddController(ledCount, Pin.Gpio18, stripType, controllerType, brightness, invert);
 					break;
 
 				case ControllerType.PWM1:
-					controller = AddController(ledCount, Pin.Gpio19, stripType,  brightness, invert);
+					controller = AddController(ledCount, Pin.Gpio13, stripType, controllerType, brightness, invert);
 					break;
 
 				case ControllerType.PCM:
-					controller = AddController(ledCount, Pin.Gpio21, stripType, brightness, invert);
+					controller = AddController(ledCount, Pin.Gpio21, stripType, controllerType, brightness, invert);
 					break;
 
 				case ControllerType.SPI:
-					controller = AddController(ledCount, Pin.Gpio10, stripType, brightness, invert);
-					break;
-				default:
-					controller = AddController(ledCount, Pin.Gpio18, stripType, brightness, invert);
+					controller = AddController(ledCount, Pin.Gpio10, stripType, controllerType, brightness, invert);
 					break;
 			}
-
-			Controller = controller;
 			return controller;
 		}
 
@@ -150,13 +152,12 @@ namespace rpi_ws281x
 		/// <summary>
 		/// Returns the channels which holds the LEDs
 		/// </summary>
-		internal Controller Controller { get; private set; }
+		internal Dictionary<int,Controller> Controllers { get; private set; }
 
 		/// <summary>
 		/// Returns the Gamma Corrections Map
 		/// </summary>
 		internal List<Byte> GammaCorrection { get; private set; }
-
 
     }
 }

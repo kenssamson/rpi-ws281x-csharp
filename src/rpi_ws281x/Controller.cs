@@ -2,22 +2,26 @@
 using System.Drawing;
 using System.Linq;
 
-namespace rpi_ws281x {
-	/// <summary>
-	/// Represents the controller which drives the LEDs
-	/// </summary>
-	public class Controller {
-		internal Controller(int ledCount, Pin pin, byte brightness, bool invert, StripType stripType,
-			ControllerType controllerType) {
+namespace rpi_ws281x
+{
+    /// <summary>
+    /// Represents the controller which drives the LEDs
+    /// </summary>
+    public class Controller
+	{
+		internal Controller(int ledCount, Pin pin, byte  brightness, bool invert, StripType stripType, ControllerType controllerType)
+		{
 			IsDirty = false;
+
 			Pin = pin;
-			GPIOPin = (int) pin;
+			GPIOPin = (int)pin;
 			Invert = invert;
 			Brightness = brightness;
 			StripType = stripType;
 			ControllerType = controllerType;
-			LEDColors = Enumerable.Range(0, ledCount).Select(x => new LED()).ToList();
-		}
+
+            LEDColors = Enumerable.Range(0, ledCount).Select(x => new LED()).ToList();
+        }
 
 		/// <summary>
 		/// Set LED to a Color
@@ -25,12 +29,10 @@ namespace rpi_ws281x {
 		/// <param name="ledID">LED to set (0 based)</param>
 		/// <param name="color">Color to use</param>
 		public void SetLED(int ledID, Color color) {
-			// If our strip type has a white component, adjust the color value so it renders correctly
 			var cName = StripType.ToString();
 			if (cName.Contains("W") && cName.Contains("SK")) {
 				color = ColorClamp.ClampAlpha(color);
 			}
-
 			LEDColors[ledID].Color = color;
 			IsDirty = true;
 		}
@@ -40,20 +42,21 @@ namespace rpi_ws281x {
 		/// </summary>
 		/// <param name="color">color to set all the LEDs</param>
 		public void SetAll(Color color) {
-			// If our strip type has a white component, adjust the color value so it renders correctly
 			var cName = StripType.ToString();
 			if (cName.Contains("W") && cName.Contains("SK")) {
 				color = ColorClamp.ClampAlpha(color);
 			}
-
 			LEDColors.ForEach(led => led.Color = color);
 			IsDirty = true;
 		}
+		
+		
 
 		/// <summary>
 		/// Turn off all the LEDs in the strip
 		/// </summary>
-		public void Reset() {
+		public void Reset()
+		{
 			LEDColors.ForEach(led => led.Color = Color.Empty);
 			IsDirty = true;
 		}
@@ -62,11 +65,12 @@ namespace rpi_ws281x {
 		/// array of LEDs with numeric color values
 		/// </summary>
 		/// <param name="clearDirty">reset dirty flag</param>
-		internal int[] GetColors(bool clearDirty = false) {
+		internal int[] GetColors(bool clearDirty = false)
+		{
 			if (clearDirty) IsDirty = false;
 			return LEDColors.Select(x => x.RGBValue).ToArray();
 		}
-
+		
 		internal List<LED> LEDColors { get; private set; }
 
 		/// <summary>
@@ -97,15 +101,15 @@ namespace rpi_ws281x {
 		/// </summary>
 		public StripType StripType { get; private set; }
 
-		/// <summary>
-		/// Returns all LEDs on this channel
-		/// </summary>
-		public IReadOnlyCollection<LED> LEDs => LEDColors.AsReadOnly();
+        /// <summary>
+        /// Returns all LEDs on this channel
+        /// </summary>
+        public IReadOnlyCollection<LED> LEDs => LEDColors.AsReadOnly();
 
 		/// <summary>
 		/// The number of LEDs in the strip
 		/// </summary>
-		public int LEDCount {
+        public int LEDCount {
 			get => LEDColors.Count;
 			set {
 				LEDColors = Enumerable.Range(0, value).Select(x => new LED()).ToList();

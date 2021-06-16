@@ -26,25 +26,75 @@ namespace rpi_ws281x
         /// <summary>
         /// Return a user friendly message based on return code
         /// </summary>
-        public static string GetErrorMessage(ws2811_return_t returnCode) {
-            var result = returnCode switch {
-                ws2811_return_t.WS2811_SUCCESS => "Operation Successful",
-                ws2811_return_t.WS2811_ERROR_GENERIC => "Generic failure",
-                ws2811_return_t.WS2811_ERROR_OUT_OF_MEMORY => "Out of memory",
-                ws2811_return_t.WS2811_ERROR_HW_NOT_SUPPORTED => "Hardware revision is not supported",
-                ws2811_return_t.WS2811_ERROR_MEM_LOCK => "Memory lock failed",
-                ws2811_return_t.WS2811_ERROR_MMAP => "nmap() failed",
-                ws2811_return_t.WS2811_ERROR_MAP_REGISTERS => "Unable to map registers to userspace",
-                ws2811_return_t.WS2811_ERROR_GPIO_INIT => "Unable to initialize GPIO",
-                ws2811_return_t.WS2811_ERROR_PWM_SETUP => "Unable to initialize PWM",
-                ws2811_return_t.WS2811_ERROR_MAILBOX_DEVICE => "Failed to create mailbox device",
-                ws2811_return_t.WS2811_ERROR_DMA => "DMA Error",
-                ws2811_return_t.WS2811_ERROR_ILLEGAL_GPIO => "Selected GPIO not supported",
-                ws2811_return_t.WS2811_ERROR_PCM_SETUP => "Unable to initialize PCM",
-                ws2811_return_t.WS2811_ERROR_SPI_SETUP => "Unable to initialize SPI",
-                ws2811_return_t.WS2811_ERROR_SPI_TRANSFER => "SPI transfer error",
-                _ => "Unknown Error Occurred"
-            };
+        public static string GetErrorMessage(ws2811_return_t return_code)
+        {
+            var result = string.Empty;
+
+            switch (return_code)
+            {
+                case ws2811_return_t.WS2811_SUCCESS:
+                    result = "Operation Successful";
+                    break;
+                case ws2811_return_t.WS2811_ERROR_GENERIC:
+                    result = "Generic failure";
+                    break;
+
+                case ws2811_return_t.WS2811_ERROR_OUT_OF_MEMORY:
+                    result = "Out of memory";
+                    break;
+
+                case ws2811_return_t.WS2811_ERROR_HW_NOT_SUPPORTED:
+                    result = "Hardware revision is not supported";
+                    break;
+
+                case ws2811_return_t.WS2811_ERROR_MEM_LOCK:
+                    result = "Memory lock failed";
+                    break;
+
+                case ws2811_return_t.WS2811_ERROR_MMAP:
+                    result = "nmap() failed";
+                    break;
+
+                case ws2811_return_t.WS2811_ERROR_MAP_REGISTERS:
+                    result = "Unable to map registers to userspace";
+                    break;
+
+                case ws2811_return_t.WS2811_ERROR_GPIO_INIT:
+                    result = "Unable to initialize GPIO";
+                    break;
+
+                case ws2811_return_t.WS2811_ERROR_PWM_SETUP:
+                    result = "Unable to initialize PWM";
+                    break;
+
+                case ws2811_return_t.WS2811_ERROR_MAILBOX_DEVICE:
+                    result = "Failed to create mailbox device";
+                    break;
+
+                case ws2811_return_t.WS2811_ERROR_DMA:
+                    result = "DMA Error";
+                    break;
+
+                case ws2811_return_t.WS2811_ERROR_ILLEGAL_GPIO:
+                    result = "Selected GPIO not supported";
+                    break;
+
+                case ws2811_return_t.WS2811_ERROR_PCM_SETUP:
+                    result = "Unable to initialize PCM";
+                    break;
+
+                case ws2811_return_t.WS2811_ERROR_SPI_SETUP:
+                    result = "Unable to initialize SPI";
+                    break;
+
+                case ws2811_return_t.WS2811_ERROR_SPI_TRANSFER:
+                    result = "SPI transfer error";
+                    break;
+                
+                default:
+                    result = "Unknown Error Occurred";
+                    break;
+            }
             return result;
         }
     }

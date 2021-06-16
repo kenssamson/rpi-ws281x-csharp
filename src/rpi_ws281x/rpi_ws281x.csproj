@@ -4,12 +4,12 @@
     <VersionPrefix>1.1.0</VersionPrefix>
     <LangVersion>9</LangVersion>
     <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp2.1;netcoreapp3.1;netcoreapp5.0</TargetFrameworks>
+    <PackageReleaseNotes>Fix issues with multiple LED strips, revert breaking changes.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Label="Package">
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageId>digitalhigh.rpi-ws281x-csharp</PackageId>
-    <PackageVersion>1.1.4</PackageVersion>
+    <PackageVersion>1.1.6</PackageVersion>
     <Authors>Digitalhigh</Authors>
     <Company />
     <Title>.Net Library wrapper for the rpi-ws281x library</Title>
